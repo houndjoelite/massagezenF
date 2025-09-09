@@ -4,6 +4,8 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { Suspense } from "react"
 import SimpleCookieBanner from "@/components/simple-cookie-banner"
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -79,6 +81,8 @@ export default function RootLayout({
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         <Suspense fallback={null}>{children}</Suspense>
         <SimpleCookieBanner />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

@@ -1,10 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { mockBlogPosts } from "@/data/blog-posts"
 import { fetchWithFallback } from "@/lib/wordpress-api"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params
+    console.log("Fetching WordPress post with slug:", slug)
+    
     const response = await fetchWithFallback(`/posts?slug=${slug}&_embed`, {
       headers: {
         "Content-Type": "application/json",
@@ -12,17 +13,24 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       next: { revalidate: 300 },
     })
 
+    console.log("WordPress API response status:", response.status)
+
     if (!response.ok) {
+      console.error(`WordPress API error: ${response.status} - ${response.statusText}`)
       throw new Error(`WordPress API error: ${response.status}`)
     }
 
     const posts = await response.json()
+    console.log("WordPress posts found:", posts.length)
 
     if (posts.length === 0) {
+      console.log("No posts found for slug:", slug)
       return NextResponse.json({ error: "Post not found" }, { status: 404 })
     }
 
     const post = posts[0]
+    console.log("Post found:", post.title?.rendered || "No title")
+    console.log("Featured media data:", JSON.stringify(post._embedded?.["wp:featuredmedia"], null, 2))
 
     // Transform WordPress post to match our Article interface
     const transformedPost = {
@@ -34,7 +42,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       publishedAt: post.date,
       author: post._embedded?.author?.[0]?.name || "Admin",
       category: post._embedded?.["wp:term"]?.[0]?.[0]?.name || "Non classé",
-      image: post._embedded?.["wp:featuredmedia"]?.[0]?.source_url || null,
+      image: post._embedded?.["wp:featuredmedia"]?.[0]?.source_url || 
+             post._embedded?.["wp:featuredmedia"]?.[0]?.media_details?.sizes?.large?.source_url ||
+             post._embedded?.["wp:featuredmedia"]?.[0]?.media_details?.sizes?.medium?.source_url ||
+             post._embedded?.["wp:featuredmedia"]?.[0]?.media_details?.sizes?.thumbnail?.source_url ||
+             null,
       tags: post._embedded?.["wp:term"]?.[1]?.map((tag: any) => tag.name) || [],
       seo: {
         title: post.yoast_head_json?.title || post.title.rendered,
@@ -44,18 +56,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       },
     }
 
+    console.log("Transformed post:", transformedPost.title)
     return NextResponse.json(transformedPost)
   } catch (error) {
     console.error("Error fetching WordPress post:", error)
-    console.log("Falling back to mock data for slug:", slug)
-    
-    // Chercher dans les données de test
-    const mockPost = mockBlogPosts.find(post => post.slug === slug)
-    
-    if (mockPost) {
-      return NextResponse.json(mockPost)
-    }
-    
     return NextResponse.json({ error: "Post not found" }, { status: 404 })
   }
 }

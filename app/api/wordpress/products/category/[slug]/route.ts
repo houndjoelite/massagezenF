@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { reverseCategoryMapping } from "@/lib/category-mapping"
 import { getProductsByCategory } from "@/lib/woocommerce-api"
-import { mockProductsByCategory } from "@/data/mock-products"
 
 export async function GET(
   request: NextRequest,
@@ -28,9 +27,8 @@ export async function GET(
     console.log("WooCommerce products fetched:", products.length)
 
     if (products.length === 0) {
-      console.log("Aucun produit trouvé, utilisation des données de test")
-      const mockProducts = (mockProductsByCategory as any)[slug] || []
-      return NextResponse.json(mockProducts)
+      console.log("Aucun produit trouvé pour cette catégorie")
+      return NextResponse.json([])
     }
 
     // Transformer les produits WooCommerce pour correspondre à l'interface ProductGrid
@@ -64,37 +62,7 @@ export async function GET(
 
   } catch (error) {
     console.error("Error fetching WooCommerce products:", error)
-    console.log("Utilisation des données de test pour la catégorie:", slug)
-
-    // Utiliser les données de test spécifiques à la catégorie
-    const mockProducts = (mockProductsByCategory as any)[slug] || [
-      {
-        id: "1",
-        title: "Produit de Test - Configuration WooCommerce Requise",
-        slug: "produit-test",
-        excerpt: "Ce produit s'affiche car WooCommerce n'est pas configuré. Suivez le guide de configuration.",
-        content: "<p>Pour afficher les vrais produits, configurez l'API WooCommerce selon le guide fourni.</p>",
-        image: null,
-        price: "99.99",
-        regularPrice: "149.99",
-        salePrice: undefined,
-        currency: "€",
-        stockStatus: "instock",
-        averageRating: 4.5,
-        ratingCount: 0,
-        externalUrl: null,
-        buttonText: "Voir le produit",
-        categories: ["Configuration requise"],
-        tags: ["test", "configuration"],
-        seo: {
-          title: "Configuration WooCommerce Requise",
-          description: "Configurez WooCommerce pour afficher les vrais produits",
-          keywords: ["configuration", "woocommerce"]
-        }
-      }
-    ]
-
-    return NextResponse.json(mockProducts)
+    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
   }
 }
 

@@ -79,8 +79,8 @@ export default function BlogPage() {
           </Breadcrumb>
 
           <div className="text-center space-y-4 mb-12">
-            <h1 className="text-4xl lg:text-5xl font-bold text-balance">Blog Massage & Bien-être</h1>
-            <p className="text-xl text-muted-foreground text-pretty max-w-3xl mx-auto">
+            <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-balance text-content">Blog Massage & Bien-être</h1>
+            <p className="text-base lg:text-lg text-content-soft text-pretty max-w-3xl mx-auto">
               Guides d'experts, comparatifs détaillés et conseils professionnels pour optimiser votre bien-être
             </p>
           </div>
@@ -130,13 +130,13 @@ export default function BlogPage() {
                           <Badge variant="secondary">{post.category}</Badge>
                         </div>
 
-                        <h3 className="text-xl font-semibold group-hover:text-primary transition-colors line-clamp-2">
+                        <h3 className="text-lg lg:text-xl font-semibold group-hover:text-primary transition-colors line-clamp-2 text-content">
                           {post.title}
                         </h3>
 
-                        <p className="text-muted-foreground line-clamp-3">{post.excerpt}</p>
+                        <p className="text-base lg:text-lg text-content-soft line-clamp-3">{post.excerpt}</p>
 
-                        <div className="flex items-center justify-between text-sm text-muted-foreground pt-4 border-t">
+                        <div className="flex items-center justify-between meta-text text-meta pt-4 border-t">
                           <div className="flex items-center">
                             <User className="h-4 w-4 mr-1" />
                             {post.author}

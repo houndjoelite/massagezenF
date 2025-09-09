@@ -98,6 +98,36 @@ export function Header() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t">
+            {/* Mobile Search Bar */}
+            <div className="mb-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  placeholder="Rechercher des produits, guides, articles..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1 px-4 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      // Rediriger vers la page de recherche avec la query
+                      window.location.href = `/recherche?q=${encodeURIComponent(searchQuery)}`
+                    }
+                  }}
+                />
+                <Button 
+                  onClick={() => {
+                    if (searchQuery.trim()) {
+                      window.location.href = `/recherche?q=${encodeURIComponent(searchQuery)}`
+                    }
+                  }}
+                  disabled={!searchQuery.trim()}
+                  size="sm"
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
             <nav className="flex flex-col space-y-4">
               <Link href="/categories" className="text-muted-foreground hover:text-foreground transition-colors">
                 Catégories

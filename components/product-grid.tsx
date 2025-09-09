@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Star, ShoppingCart, ExternalLink } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { AnimateOnScroll, AnimateList, HoverEffect } from "@/components/ui/animate-on-scroll"
 
 interface Product {
   id: string
@@ -131,94 +132,128 @@ export function ProductGrid({
   return (
     <div className="py-16">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">{title}</h2>
-          <p className="text-muted-foreground mb-4">{description}</p>
+        <AnimateOnScroll animation="fadeInUp" className="text-center mb-12">
+          <h2 className="text-2xl lg:text-3xl font-bold mb-4 text-content">{title}</h2>
+          <p className="text-base lg:text-lg text-content-soft mb-4">{description}</p>
           <Badge variant="secondary" className="text-sm">
             {products.length} produit{products.length > 1 ? "s" : ""} disponible{products.length > 1 ? "s" : ""}
           </Badge>
-        </div>
+        </AnimateOnScroll>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <AnimateList
+          animation="fadeInUp"
+          staggerDelay={200}
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
           {products.map((product) => (
-            <Card key={product.id} className="group hover:shadow-xl transition-all duration-300">
+            <HoverEffect key={product.id} effect="lift" intensity="high">
+              <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 hover:scale-[1.03] rounded-3xl">
               <CardContent className="p-0">
-                <div className="aspect-square overflow-hidden rounded-t-lg relative">
+                <div className="relative aspect-square overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent z-10"></div>
                   {product.image ? (
                     <Image
                       src={product.image}
                       alt={product.title}
                       width={300}
                       height={300}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                   ) : (
-                    <div className="w-full h-full bg-muted flex items-center justify-center">
-                      <span className="text-muted-foreground">Aucune image</span>
+                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+                      <span className="text-muted-foreground font-medium">Aucune image</span>
                     </div>
                   )}
-                </div>
-                <div className="p-6 space-y-4">
-                  <h3 className="text-xl font-semibold group-hover:text-primary transition-colors line-clamp-2">
-                    {product.title}
-                  </h3>
-
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${
-                            i < Math.floor(product.averageRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-muted-foreground">
-                      {product.averageRating.toFixed(1)} ({product.ratingCount} avis)
-                    </span>
+                  
+                  {/* Badge de statut en stock */}
+                  <div className="absolute top-4 right-4 z-20">
+                    {product.stockStatus === "instock" ? (
+                      <Badge className="bg-green-500/90 text-white hover:bg-green-500/95 backdrop-blur-sm border-0 shadow-lg font-medium px-3 py-1.5">
+                        En stock
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-red-500/90 text-white hover:bg-red-500/95 backdrop-blur-sm border-0 shadow-lg font-medium px-3 py-1.5">
+                        Rupture
+                      </Badge>
+                    )}
                   </div>
 
-                  <p className="text-sm text-muted-foreground line-clamp-3">
-                    {product.excerpt}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-primary">
-                          {product.price} {product.currency}
-                        </span>
-                        {product.regularPrice && product.regularPrice !== product.price && (
-                          <span className="text-sm text-muted-foreground line-through">
-                            {product.regularPrice} {product.currency}
+                  {/* Overlay avec prix */}
+                  <div className="absolute bottom-4 left-4 right-4 z-20">
+                    <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-2xl p-4 shadow-xl">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl font-bold text-primary">
+                            {product.price} {product.currency}
                           </span>
+                          {product.regularPrice && product.regularPrice !== product.price && (
+                            <span className="text-sm text-muted-foreground line-through">
+                              {product.regularPrice} {product.currency}
+                            </span>
+                          )}
+                        </div>
+                        {product.regularPrice && product.regularPrice !== product.price && (
+                          <Badge className="bg-red-500 text-white text-xs font-bold">
+                            -{Math.round(((parseFloat(product.regularPrice) - parseFloat(product.price)) / parseFloat(product.regularPrice)) * 100)}%
+                          </Badge>
                         )}
                       </div>
-                      {product.stockStatus === "instock" ? (
-                        <Badge variant="default" className="text-xs">En stock</Badge>
-                      ) : (
-                        <Badge variant="secondary" className="text-xs">Rupture de stock</Badge>
-                      )}
                     </div>
                   </div>
+                </div>
+                
+                <div className="p-8 space-y-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg lg:text-xl font-bold group-hover:text-primary transition-colors line-clamp-2 leading-tight text-content">
+                      {product.title}
+                    </h3>
 
-                  <Button className="w-full" asChild>
-                    <Link 
-                      href={product.externalUrl || `/produits/${product.slug}`} 
-                      target={product.externalUrl ? "_blank" : "_self"}
-                      rel={product.externalUrl ? "noopener noreferrer" : undefined}
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-5 h-5 ${
+                              i < Math.floor(product.averageRating) 
+                                ? "fill-yellow-400 text-yellow-400" 
+                                : "text-gray-300 dark:text-gray-600"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm font-medium text-muted-foreground">
+                        {product.averageRating.toFixed(1)} ({product.ratingCount} avis)
+                      </span>
+                    </div>
+
+                    <p className="text-base lg:text-lg text-content-soft line-clamp-3 leading-relaxed">
+                      {product.excerpt}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <Button 
+                      className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group/btn" 
+                      asChild
                     >
-                      <ShoppingCart className="w-4 h-4 mr-2" />
-                      {product.buttonText}
-                      {product.externalUrl && <ExternalLink className="w-4 h-4 ml-2" />}
-                    </Link>
-                  </Button>
+                      <Link 
+                        href={product.externalUrl || `/produits/${product.slug}`} 
+                        target={product.externalUrl ? "_blank" : "_self"}
+                        rel={product.externalUrl ? "noopener noreferrer" : undefined}
+                        className="flex items-center justify-center"
+                      >
+                        <ShoppingCart className="w-5 h-5 mr-2 group-hover/btn:scale-110 transition-transform duration-300" />
+                        {product.buttonText}
+                        {product.externalUrl && <ExternalLink className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform duration-300" />}
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
-            </Card>
+              </Card>
+            </HoverEffect>
           ))}
-        </div>
+        </AnimateList>
       </div>
     </div>
   )

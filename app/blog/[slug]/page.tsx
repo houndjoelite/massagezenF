@@ -120,41 +120,54 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             </BreadcrumbList>
           </Breadcrumb>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-8">
-              <Button variant="ghost" asChild className="mb-6">
-                <Link href="/blog">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
+          <div className="max-w-5xl mx-auto">
+            <div className="mb-12">
+              <Button 
+                variant="ghost" 
+                asChild 
+                className="mb-8 group/back hover:bg-primary/5 transition-all duration-300"
+              >
+                <Link href="/blog" className="flex items-center">
+                  <ArrowLeft className="mr-2 h-4 w-4 group-hover/back:-translate-x-1 transition-transform duration-300" />
                   Retour au blog
                 </Link>
               </Button>
 
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center gap-4 flex-wrap">
-                  <Badge variant="secondary">{article.category}</Badge>
-                  <div className="flex items-center text-sm text-muted-foreground gap-4">
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
+              <div className="space-y-8 mb-12">
+                <div className="flex items-center gap-6 flex-wrap">
+                  <Badge className="bg-gradient-to-r from-primary to-primary/80 text-white border-0 px-4 py-2 text-sm font-medium shadow-lg">
+                    {article.category}
+                  </Badge>
+                  <div className="flex items-center text-sm text-muted-foreground gap-6">
+                    <div className="flex items-center bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-full px-4 py-2">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <span className="font-medium">{new Date(article.publishedAt).toLocaleDateString("fr-FR")}</span>
                     </div>
-                    <div className="flex items-center">
-                      <User className="h-4 w-4 mr-1" />
-                      {article.author}
+                    <div className="flex items-center bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-full px-4 py-2">
+                      <User className="h-4 w-4 mr-2" />
+                      <span className="font-medium">{article.author}</span>
                     </div>
                   </div>
                 </div>
 
-                <h1 className="text-4xl lg:text-5xl font-bold text-balance">{article.title}</h1>
-                <p className="text-xl text-muted-foreground text-pretty">{article.excerpt}</p>
+                <div className="space-y-6">
+                  <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-balance leading-tight text-content">
+                    {article.title}
+                  </h1>
+                  <p className="text-base lg:text-lg text-content-soft text-pretty leading-relaxed max-w-4xl">
+                    {article.excerpt}
+                  </p>
+                </div>
               </div>
 
               {article.image && (
-                <div className="aspect-video overflow-hidden rounded-lg mb-8">
+                <div className="relative aspect-video overflow-hidden rounded-3xl mb-12 shadow-2xl">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-10"></div>
                   <Image
                     src={article.image}
                     alt={article.title}
-                    width={800}
-                    height={450}
+                    width={1200}
+                    height={675}
                     className="w-full h-full object-cover"
                     priority
                   />
@@ -162,24 +175,28 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               )}
             </div>
 
-            <div className="prose prose-lg max-w-none">
+            <div className="prose prose-xl max-w-none prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 dark:prose-strong:text-white prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-gray-50 dark:prose-blockquote:bg-gray-800/50 prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:rounded-r-lg prose-blockquote:italic">
               <div dangerouslySetInnerHTML={{ __html: article.content }} />
             </div>
 
-            <div className="mt-12 pt-8 border-t">
+            <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <User className="h-4 w-4 mr-1" />
-                    {article.author}
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center text-sm text-muted-foreground bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-full px-4 py-2">
+                    <User className="h-4 w-4 mr-2" />
+                    <span className="font-medium">{article.author}</span>
                   </div>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
+                  <div className="flex items-center text-sm text-muted-foreground bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-full px-4 py-2">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    <span className="font-medium">{new Date(article.publishedAt).toLocaleDateString("fr-FR")}</span>
                   </div>
                 </div>
-                <Button variant="outline" size="sm">
-                  <Share2 className="h-4 w-4 mr-2" />
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-gray-200 dark:border-gray-700 hover:bg-primary/5 hover:border-primary/20 transition-all duration-300 group/share"
+                >
+                  <Share2 className="h-4 w-4 mr-2 group-hover/share:scale-110 transition-transform duration-300" />
                   Partager
                 </Button>
               </div>
