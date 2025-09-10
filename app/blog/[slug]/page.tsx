@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { User, Calendar, ArrowLeft, Share2 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { WordPressContent } from "@/components/wordpress-content"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -35,8 +36,12 @@ interface Article {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/wordpress/posts/${slug}`,
+      `${baseUrl}/api/wordpress/posts/${slug}`,
       { next: { revalidate: 300 } }
     )
 
@@ -69,8 +74,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   let article: Article | null = null
 
   try {
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/wordpress/posts/${slug}`,
+      `${baseUrl}/api/wordpress/posts/${slug}`,
       {
         next: { revalidate: 300 }, // Cache for 5 minutes
       },
@@ -175,9 +184,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               )}
             </div>
 
-            <div className="prose prose-xl max-w-none prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 dark:prose-strong:text-white prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-gray-50 dark:prose-blockquote:bg-gray-800/50 prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:rounded-r-lg prose-blockquote:italic">
-              <div dangerouslySetInnerHTML={{ __html: article.content }} />
-            </div>
+            <WordPressContent 
+              content={article.content} 
+              className="prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 dark:prose-strong:text-white"
+            />
 
             <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">

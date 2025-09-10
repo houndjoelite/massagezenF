@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, ShoppingCart, ExternalLink, Star, Truck, Shield, RotateCcw } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { ProductGallery } from "@/components/product-gallery"
 
 interface Product {
   id: string
@@ -284,9 +285,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <h2 className="text-3xl lg:text-4xl font-bold mb-8 text-center bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
                 Détails du produit
               </h2>
-              <div 
-                className="prose prose-xl max-w-none prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 dark:prose-strong:text-white prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-gray-50 dark:prose-blockquote:bg-gray-800/50 prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-ul:space-y-2 prose-li:marker:text-primary"
-                dangerouslySetInnerHTML={{ __html: product.content }}
+              <ProductGallery 
+                content={product.content}
+                className="prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 dark:prose-strong:text-white"
               />
             </div>
           </div>

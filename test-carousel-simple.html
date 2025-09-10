@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Carrousel Simple</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Styles pour le carrousel simple */
+        .simple-carousel-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .carousel-viewport {
+            flex: 1;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-slides {
+            display: flex;
+            transition: transform 0.5s ease;
+            width: 100%;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            position: relative;
+            cursor: pointer;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .carousel-slide:hover img {
+            transform: scale(1.05);
+        }
+
+        .slide-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            color: white;
+            padding: 2rem 1rem 1rem 1rem;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        .carousel-arrow {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .carousel-arrow:hover {
+            background: white;
+            transform: scale(1.1);
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-arrow svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: #374151;
+        }
+
+        .carousel-arrow-left {
+            order: 1;
+        }
+
+        .carousel-viewport {
+            order: 2;
+        }
+
+        .carousel-arrow-right {
+            order: 3;
+        }
+        
+        .test-info {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f0f9ff;
+            border-radius: 0.5rem;
+            border-left: 4px solid #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Test Carrousel Simple</h1>
+        <p>Carrousel avec défilement horizontal uniquement (gauche vers droite)</p>
+        
+        <div class="simple-carousel-container">
+            <button class="carousel-arrow carousel-arrow-left" onclick="simpleCarouselPrevious(0)">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            
+            <div class="carousel-viewport">
+                <div class="carousel-slides" id="simple-carousel-0">
+                    <div class="carousel-slide">
+                        <img src="https://picsum.photos/800/450?random=1" alt="Image 1" />
+                        <div class="slide-caption">Image 1 - Premier slide</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://picsum.photos/800/450?random=2" alt="Image 2" />
+                        <div class="slide-caption">Image 2 - Deuxième slide</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://picsum.photos/800/450?random=3" alt="Image 3" />
+                        <div class="slide-caption">Image 3 - Troisième slide</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://picsum.photos/800/450?random=4" alt="Image 4" />
+                        <div class="slide-caption">Image 4 - Quatrième slide</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="carousel-arrow carousel-arrow-right" onclick="simpleCarouselNext(0)">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </div>
+        
+        <div class="test-info">
+            <h3>✅ Fonctionnalités testées :</h3>
+            <ul>
+                <li><strong>Défilement horizontal uniquement</strong> : Les images défilent de gauche vers droite</li>
+                <li><strong>Flèches de navigation</strong> : Boutons précédent/suivant sur les côtés</li>
+                <li><strong>Une image à la fois</strong> : Affichage d'une seule image dans le viewport</li>
+                <li><strong>Transitions fluides</strong> : Animation de 0.5s entre les slides</li>
+                <li><strong>Légendes</strong> : Texte en overlay sur chaque image</li>
+                <li><strong>Hover effects</strong> : Zoom sur l'image au survol</li>
+                <li><strong>Responsive</strong> : S'adapte aux différentes tailles d'écran</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Fonctions pour le carrousel simple
+        function simpleCarouselPrevious(galleryIndex) {
+            const slides = document.getElementById(`simple-carousel-${galleryIndex}`)
+            if (!slides) return
+
+            const currentTransform = slides.style.transform || 'translateX(0px)'
+            const match = currentTransform.match(/-?\d+/)
+            const currentX = parseInt(match ? match[0] : '0')
+            const slideWidth = slides.clientWidth / slides.children.length
+            
+            const newX = currentX + slideWidth
+            slides.style.transform = `translateX(${Math.min(0, newX)}px)`
+        }
+
+        function simpleCarouselNext(galleryIndex) {
+            const slides = document.getElementById(`simple-carousel-${galleryIndex}`)
+            if (!slides) return
+
+            const currentTransform = slides.style.transform || 'translateX(0px)'
+            const match = currentTransform.match(/-?\d+/)
+            const currentX = parseInt(match ? match[0] : '0')
+            const slideWidth = slides.clientWidth / slides.children.length
+            const maxX = -(slides.children.length - 1) * slideWidth
+            
+            const newX = currentX - slideWidth
+            slides.style.transform = `translateX(${Math.max(maxX, newX)}px)`
+        }
+    </script>
+</body>
+</html>
