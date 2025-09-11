@@ -5,13 +5,13 @@
     }
   },
   "env": {
-    "NEXT_PUBLIC_SITE_URL": "https://massagezen-f.vercel.app",
+    "NEXT_PUBLIC_SITE_URL": "https://monappareildemassage.com",
     "NEXT_PUBLIC_WORDPRESS_URL": "https://cmsmonappareildemagge.monappareildemassage.com",
     "WORDPRESS_API_URL": "https://cmsmonappareildemagge.monappareildemassage.com/wp-json/wp/v2"
   },
   "build": {
     "env": {
-      "NEXT_PUBLIC_SITE_URL": "https://massagezen-f.vercel.app",
+      "NEXT_PUBLIC_SITE_URL": "https://monappareildemassage.com",
       "NEXT_PUBLIC_WORDPRESS_URL": "https://cmsmonappareildemagge.monappareildemassage.com",
       "WORDPRESS_API_URL": "https://cmsmonappareildemagge.monappareildemassage.com/wp-json/wp/v2"
     }

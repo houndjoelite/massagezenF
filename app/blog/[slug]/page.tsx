@@ -42,7 +42,7 @@ export const revalidate = 0
 export async function generateStaticParams() {
   try {
     const baseUrl = process.env.NODE_ENV === 'production' 
-      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://massagezen-f.vercel.app'
+      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
       : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
     
     const response = await fetch(
@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     
     // Utiliser l'URL absolue pour la production
     const baseUrl = process.env.NODE_ENV === 'production' 
-      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://massagezen-f.vercel.app'
+      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
       : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
     
     const response = await fetch(
@@ -128,7 +128,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   try {
     // Utiliser l'URL absolue pour la production
     const baseUrl = process.env.NODE_ENV === 'production' 
-      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://massagezen-f.vercel.app'
+      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
       : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
     
     console.log(`Fetching article ${slug} from ${baseUrl}`)

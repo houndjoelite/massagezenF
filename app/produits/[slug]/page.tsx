@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: ProductPageProps) {
   try {
     // Utiliser l'URL absolue pour la production
     const baseUrl = process.env.NODE_ENV === 'production' 
-      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://massagezen-f.vercel.app'
+      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
       : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
     
     const response = await fetch(
@@ -92,7 +92,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   try {
     // Utiliser l'URL absolue pour la production
     const baseUrl = process.env.NODE_ENV === 'production' 
-      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://massagezen-f.vercel.app'
+      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
       : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
     
     console.log(`Fetching product ${slug} from ${baseUrl}`)
