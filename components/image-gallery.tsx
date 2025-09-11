@@ -131,3 +131,4 @@ export function ImageGallery({ images, captions = [] }: ImageGalleryProps) {
     </>
   )
 }
+

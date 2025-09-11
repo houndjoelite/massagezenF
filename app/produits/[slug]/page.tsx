@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: ProductPageProps) {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/wordpress/products/${slug}`,
       {
-        next: { revalidate: 300 },
+        cache: "no-store", // Force le fetch de données fraîches
       },
     )
 
@@ -78,7 +78,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/wordpress/products/${slug}`,
       {
-        next: { revalidate: 300 },
+        cache: "no-store", // Force le fetch de données fraîches
       },
     )
 

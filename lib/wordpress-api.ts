@@ -1,7 +1,9 @@
 // Utilitaire pour gérer le fallback HTTPS/HTTP avec WordPress
+const WORDPRESS_BASE_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL || "https://cmsmonappareildemagge.monappareildemassage.com"
+
 const WORDPRESS_DOMAINS = {
-  https: "https://cmsmonappareildemagge.monappareildemassage.com",
-  http: "http://cmsmonappareildemagge.monappareildemassage.com"
+  https: WORDPRESS_BASE_URL,
+  http: WORDPRESS_BASE_URL.replace('https://', 'http://')
 }
 
 const API_PATH = "/wp-json/wp/v2"
@@ -44,6 +46,7 @@ export async function fetchWithFallback(endpoint: string, options: RequestInit =
     // Essayer HTTPS en premier
     const response = await fetch(httpsUrl, {
       ...options,
+      cache: "no-store", // Force le fetch de données fraîches
       signal: AbortSignal.timeout(10000), // Timeout de 10 secondes
     })
     
@@ -59,6 +62,7 @@ export async function fetchWithFallback(endpoint: string, options: RequestInit =
     try {
       const response = await fetch(httpUrl, {
         ...options,
+        cache: "no-store", // Force le fetch de données fraîches
         signal: AbortSignal.timeout(10000),
       })
       

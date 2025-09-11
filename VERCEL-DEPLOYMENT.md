@@ -62,3 +62,4 @@ Si vous rencontrez encore des problèmes :
 1. Vérifiez les logs Vercel dans le dashboard
 2. Testez l'API directement : `https://votre-domaine.vercel.app/api/wordpress/posts/[slug]`
 3. Vérifiez que votre WordPress est accessible depuis Vercel
+

@@ -1,7 +1,9 @@
 // Utilitaire pour l'API WooCommerce avec authentification
+const WORDPRESS_BASE_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL || "https://cmsmonappareildemagge.monappareildemassage.com"
+
 const WORDPRESS_DOMAINS = {
-  https: "https://cmsmonappareildemagge.monappareildemassage.com",
-  http: "http://cmsmonappareildemagge.monappareildemassage.com"
+  https: WORDPRESS_BASE_URL,
+  http: WORDPRESS_BASE_URL.replace('https://', 'http://')
 }
 
 // Clés API WooCommerce
@@ -26,6 +28,7 @@ export async function fetchWooCommerce(endpoint: string, options: RequestInit = 
     
     const response = await fetch(httpsUrl, {
       ...options,
+      cache: "no-store", // Force le fetch de données fraîches
       headers: {
         'Authorization': `Basic ${credentials}`,
         'Content-Type': 'application/json',
@@ -50,6 +53,7 @@ export async function fetchWooCommerce(endpoint: string, options: RequestInit = 
       
       const response = await fetch(httpUrl, {
         ...options,
+        cache: "no-store", // Force le fetch de données fraîches
         headers: {
           'Authorization': `Basic ${credentials}`,
           'Content-Type': 'application/json',

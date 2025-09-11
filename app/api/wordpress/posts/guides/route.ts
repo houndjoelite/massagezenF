@@ -3,7 +3,9 @@ import { NextResponse } from "next/server"
 // Contourner les problèmes SSL pour WordPress
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"
 
-const WORDPRESS_API_URL = process.env.WORDPRESS_API_URL || "https://cmsmonappareildemagge.monappareildemassage.com/wp-json/wp/v2"
+const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL 
+  ? `${process.env.NEXT_PUBLIC_WORDPRESS_URL}/wp-json/wp/v2`
+  : "https://cmsmonappareildemagge.monappareildemassage.com/wp-json/wp/v2"
 
 export async function GET() {
   try {
@@ -19,7 +21,7 @@ export async function GET() {
           "User-Agent": "Next.js WordPress Integration",
           "Cache-Control": "no-cache"
         },
-        next: { revalidate: 300 },
+        cache: "no-store", // Force le fetch de données fraîches
       }
     )
 
@@ -48,7 +50,7 @@ export async function GET() {
           "User-Agent": "Next.js WordPress Integration",
           "Cache-Control": "no-cache"
         },
-        next: { revalidate: 300 },
+        cache: "no-store", // Force le fetch de données fraîches
       }
     )
 

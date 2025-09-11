@@ -156,3 +156,4 @@ Vos articles WordPress ont maintenant :
 </a>
 <!-- Devient automatiquement : 🛒 Voir sur Amazon -->
 ```
+

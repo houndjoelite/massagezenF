@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-const WORDPRESS_API_URL = process.env.WORDPRESS_API_URL || "https://your-domain.com/wp-json/wp/v2"
+const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL 
+  ? `${process.env.NEXT_PUBLIC_WORDPRESS_URL}/wp-json/wp/v2`
+  : "https://cmsmonappareildemagge.monappareildemassage.com/wp-json/wp/v2"
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,7 +21,7 @@ export async function GET(request: NextRequest) {
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 300 },
+      cache: "no-store", // Force le fetch de données fraîches
     })
 
     if (!response.ok) {

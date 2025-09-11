@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     
     const response = await fetch(
       `${baseUrl}/api/wordpress/posts/${slug}`,
-      { next: { revalidate: 300 } }
+      { cache: "no-store" } // Force le fetch de données fraîches
     )
 
     if (!response.ok) {
@@ -81,7 +81,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     const response = await fetch(
       `${baseUrl}/api/wordpress/posts/${slug}`,
       {
-        next: { revalidate: 300 }, // Cache for 5 minutes
+        cache: "no-store", // Force le fetch de données fraîches
       },
     )
 

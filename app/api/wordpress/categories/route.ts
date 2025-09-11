@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server"
 
-const WORDPRESS_API_URL = process.env.WORDPRESS_API_URL || "https://your-domain.com/wp-json/wp/v2"
+const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL 
+  ? `${process.env.NEXT_PUBLIC_WORDPRESS_URL}/wp-json/wp/v2`
+  : "https://cmsmonappareildemagge.monappareildemassage.com/wp-json/wp/v2"
 
 export async function GET() {
   try {
     // Fetch both post categories and product categories
     const [postCategories, productCategories] = await Promise.all([
       fetch(`${WORDPRESS_API_URL}/categories?per_page=100`, {
-        next: { revalidate: 3600 }, // Cache for 1 hour
+        cache: "no-store", // Force le fetch de données fraîches
       }),
       fetch(`${WORDPRESS_API_URL}/product_categories?per_page=100`, {
-        next: { revalidate: 3600 },
+        cache: "no-store", // Force le fetch de données fraîches
       }).catch(() => ({ ok: false })), // Fallback if custom taxonomy doesn't exist
     ])
 

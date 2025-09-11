@@ -163,3 +163,4 @@ Vos articles WordPress ont maintenant :
   <div class="gallery-counter">1 / 5</div>
 </div>
 ```
+

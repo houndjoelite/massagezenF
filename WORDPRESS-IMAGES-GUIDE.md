@@ -105,3 +105,4 @@ Si vous rencontrez des problèmes :
 2. Testez en local d'abord
 3. Vérifiez la console pour les erreurs
 4. Les galeries nécessitent au moins 2 images pour être détectées
+

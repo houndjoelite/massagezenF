@@ -164,3 +164,4 @@ Vos articles WordPress ont maintenant :
 </a>
 <!-- Devient : [Voir sur Amazon] (bouton bleu sans icône) -->
 ```
+

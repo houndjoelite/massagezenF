@@ -133,3 +133,4 @@ Vos articles WordPress ont maintenant :
 - **Titres colorés** pour une meilleure hiérarchie visuelle
 - **Design responsive** sur tous les appareils
 - **Mode sombre** automatique
+
