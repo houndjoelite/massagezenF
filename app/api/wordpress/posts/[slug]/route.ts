@@ -9,6 +9,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const response = await fetchWithFallback(`/posts?slug=${slug}&_embed`, {
       headers: {
         "Content-Type": "application/json",
+        "User-Agent": "MassageZen/1.0",
       },
       cache: "no-store", // Force le fetch de données fraîches
     })
@@ -17,7 +18,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     if (!response.ok) {
       console.error(`WordPress API error: ${response.status} - ${response.statusText}`)
-      throw new Error(`WordPress API error: ${response.status}`)
+      return NextResponse.json({ 
+        error: `WordPress API error: ${response.status}`,
+        details: response.statusText 
+      }, { status: response.status })
     }
 
     const posts = await response.json()
@@ -25,12 +29,23 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     if (posts.length === 0) {
       console.log("No posts found for slug:", slug)
-      return NextResponse.json({ error: "Post not found" }, { status: 404 })
+      return NextResponse.json({ 
+        error: "Post not found",
+        slug: slug 
+      }, { status: 404 })
     }
 
     const post = posts[0]
     console.log("Post found:", post.title?.rendered || "No title")
-    console.log("Featured media data:", JSON.stringify(post._embedded?.["wp:featuredmedia"], null, 2))
+
+    // Vérifier que le post est publié
+    if (post.status !== 'publish') {
+      console.log("Post is not published:", post.status)
+      return NextResponse.json({ 
+        error: "Post not published",
+        slug: slug 
+      }, { status: 404 })
+    }
 
     // Transform WordPress post to match our Article interface
     const transformedPost = {
@@ -60,6 +75,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json(transformedPost)
   } catch (error) {
     console.error("Error fetching WordPress post:", error)
-    return NextResponse.json({ error: "Post not found" }, { status: 404 })
+    return NextResponse.json({ 
+      error: "Internal server error",
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 })
   }
 }

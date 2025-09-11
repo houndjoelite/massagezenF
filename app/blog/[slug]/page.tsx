@@ -6,6 +6,7 @@ import { User, Calendar, ArrowLeft, Share2 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { WordPressContent } from "@/components/wordpress-content"
+import { DebugInfo } from "@/components/debug-info"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -33,21 +34,66 @@ interface Article {
   }
 }
 
+// Configuration pour le rendu dynamique
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+// Générer les paramètres statiques pour les articles populaires
+export async function generateStaticParams() {
+  try {
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://massagezen-f.vercel.app'
+      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    
+    const response = await fetch(
+      `${baseUrl}/api/wordpress/posts?limit=50`,
+      { 
+        cache: "no-store",
+        headers: {
+          'User-Agent': 'MassageZen/1.0',
+        }
+      }
+    )
+
+    if (!response.ok) {
+      console.error('Failed to fetch posts for static params:', response.status)
+      return []
+    }
+
+    const posts = await response.json()
+    return posts.map((post: Article) => ({
+      slug: post.slug,
+    }))
+  } catch (error) {
+    console.error('Error generating static params:', error)
+    return []
+  }
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
+    
+    // Utiliser l'URL absolue pour la production
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://massagezen-f.vercel.app'
       : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
     
     const response = await fetch(
       `${baseUrl}/api/wordpress/posts/${slug}`,
-      { cache: "no-store" } // Force le fetch de données fraîches
+      { 
+        cache: "no-store",
+        headers: {
+          'User-Agent': 'MassageZen/1.0',
+        }
+      }
     )
 
     if (!response.ok) {
+      console.error(`Metadata fetch failed for ${slug}: ${response.status}`)
       return {
         title: "Article non trouvé | MassageZen",
+        description: "Cet article n'existe pas ou a été supprimé.",
       }
     }
 
@@ -59,12 +105,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       openGraph: {
         title: article.seo.title,
         description: article.seo.description,
-        images: [article.image],
+        images: article.image ? [article.image] : [],
+        type: 'article',
+        publishedTime: article.publishedAt,
+        authors: [article.author],
       },
     }
   } catch (error) {
+    console.error(`Metadata generation error:`, error)
     return {
       title: "Article non trouvé | MassageZen",
+      description: "Cet article n'existe pas ou a été supprimé.",
     }
   }
 }
@@ -72,24 +123,39 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   let article: Article | null = null
+  let error: string | null = null
 
   try {
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
+    // Utiliser l'URL absolue pour la production
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://massagezen-f.vercel.app'
       : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    
+    console.log(`Fetching article ${slug} from ${baseUrl}`)
     
     const response = await fetch(
       `${baseUrl}/api/wordpress/posts/${slug}`,
       {
-        cache: "no-store", // Force le fetch de données fraîches
-      },
+        cache: "no-store",
+        headers: {
+          'User-Agent': 'MassageZen/1.0',
+        }
+      }
     )
+
+    console.log(`Response status for ${slug}: ${response.status}`)
 
     if (response.ok) {
       article = await response.json()
+      console.log(`Article ${slug} loaded successfully:`, article?.title)
+    } else {
+      const errorData = await response.json().catch(() => ({}))
+      error = errorData.error || `HTTP ${response.status}: ${response.statusText}`
+      console.error(`Failed to fetch article ${slug}:`, error)
     }
-  } catch (error) {
-    console.error("Error fetching article:", error)
+  } catch (err) {
+    error = err instanceof Error ? err.message : 'Unknown error'
+    console.error(`Error fetching article ${slug}:`, err)
   }
 
   if (!article) {
@@ -98,10 +164,18 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <Header />
         <main className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-4xl font-bold mb-4">Article non trouvé</h1>
-          <p className="text-muted-foreground mb-8">Cet article n'existe pas ou a été supprimé.</p>
-          <Button asChild>
-            <Link href="/blog">Retour au blog</Link>
-          </Button>
+          <p className="text-muted-foreground mb-8">
+            {error ? `Erreur: ${error}` : "Cet article n'existe pas ou a été supprimé."}
+          </p>
+          <div className="space-y-4">
+            <Button asChild>
+              <Link href="/blog">Retour au blog</Link>
+            </Button>
+            <div className="text-sm text-muted-foreground">
+              Slug recherché: <code className="bg-gray-100 px-2 py-1 rounded">{slug}</code>
+            </div>
+            <DebugInfo slug={slug} type="article" error={error || undefined} />
+          </div>
         </main>
         <Footer />
       </div>
@@ -188,6 +262,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               content={article.content} 
               className="prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 dark:prose-strong:text-white"
             />
+
+            <DebugInfo slug={slug} type="article" data={article} />
 
             <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">

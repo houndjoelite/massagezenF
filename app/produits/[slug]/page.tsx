@@ -37,15 +37,27 @@ interface ProductPageProps {
   params: Promise<{ slug: string }>
 }
 
+// Configuration pour le rendu dynamique
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function generateMetadata({ params }: ProductPageProps) {
   const { slug } = await params
   
   try {
+    // Utiliser l'URL absolue pour la production
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://massagezen-f.vercel.app'
+      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/wordpress/products/${slug}`,
+      `${baseUrl}/api/wordpress/products/${slug}`,
       {
-        cache: "no-store", // Force le fetch de données fraîches
-      },
+        cache: "no-store",
+        headers: {
+          'User-Agent': 'MassageZen/1.0',
+        }
+      }
     )
 
     if (response.ok) {
@@ -58,6 +70,7 @@ export async function generateMetadata({ params }: ProductPageProps) {
           title: product.title,
           description: product.excerpt || product.seo.description,
           images: product.image ? [product.image] : [],
+          type: 'product',
         },
       }
     }
@@ -67,30 +80,69 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
   return {
     title: "Produit non trouvé | MassageZen",
+    description: "Ce produit n'existe pas ou a été supprimé.",
   }
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params
   let product: Product | null = null
+  let error: string | null = null
 
   try {
+    // Utiliser l'URL absolue pour la production
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://massagezen-f.vercel.app'
+      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    
+    console.log(`Fetching product ${slug} from ${baseUrl}`)
+    
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/wordpress/products/${slug}`,
+      `${baseUrl}/api/wordpress/products/${slug}`,
       {
-        cache: "no-store", // Force le fetch de données fraîches
-      },
+        cache: "no-store",
+        headers: {
+          'User-Agent': 'MassageZen/1.0',
+        }
+      }
     )
+
+    console.log(`Response status for product ${slug}: ${response.status}`)
 
     if (response.ok) {
       product = await response.json()
+      console.log(`Product ${slug} loaded successfully:`, product?.title)
+    } else {
+      const errorData = await response.json().catch(() => ({}))
+      error = errorData.error || `HTTP ${response.status}: ${response.statusText}`
+      console.error(`Failed to fetch product ${slug}:`, error)
     }
-  } catch (error) {
-    console.error("Error fetching product:", error)
+  } catch (err) {
+    error = err instanceof Error ? err.message : 'Unknown error'
+    console.error(`Error fetching product ${slug}:`, err)
   }
 
   if (!product) {
-    notFound()
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <main className="container mx-auto px-4 py-20 text-center">
+          <h1 className="text-4xl font-bold mb-4">Produit non trouvé</h1>
+          <p className="text-muted-foreground mb-8">
+            {error ? `Erreur: ${error}` : "Ce produit n'existe pas ou a été supprimé."}
+          </p>
+          <div className="space-y-4">
+            <Button asChild>
+              <Link href="/categories">Retour aux catégories</Link>
+            </Button>
+            <div className="text-sm text-muted-foreground">
+              Slug recherché: <code className="bg-gray-100 px-2 py-1 rounded">{slug}</code>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
   }
 
   return (

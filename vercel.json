@@ -5,12 +5,35 @@
     }
   },
   "env": {
-    "NEXT_PUBLIC_SITE_URL": "@next_public_site_url"
+    "NEXT_PUBLIC_SITE_URL": "https://massagezen-f.vercel.app",
+    "NEXT_PUBLIC_WORDPRESS_URL": "https://cmsmonappareildemagge.monappareildemassage.com",
+    "WORDPRESS_API_URL": "https://cmsmonappareildemagge.monappareildemassage.com/wp-json/wp/v2"
   },
   "build": {
     "env": {
-      "NEXT_PUBLIC_SITE_URL": "@next_public_site_url"
+      "NEXT_PUBLIC_SITE_URL": "https://massagezen-f.vercel.app",
+      "NEXT_PUBLIC_WORDPRESS_URL": "https://cmsmonappareildemagge.monappareildemassage.com",
+      "WORDPRESS_API_URL": "https://cmsmonappareildemagge.monappareildemassage.com/wp-json/wp/v2"
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ]
 }
 
