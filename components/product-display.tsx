@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Star, ShoppingCart, ExternalLink, Truck, Shield, RotateCcw, CheckCircle } from "lucide-react"
+import { Star, ShoppingCart, ExternalLink, CheckCircle } from "lucide-react"
 import { ProductGallery } from "./product-gallery"
 
 interface Product {
@@ -80,7 +80,7 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
             )}
             
             {/* Titre principal */}
-            <h1 className="text-4xl lg:text-5xl font-bold text-balance leading-tight text-gray-900 dark:text-white">
+            <h1 className="text-5xl lg:text-6xl font-black text-balance leading-tight bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-700 bg-clip-text text-transparent drop-shadow-lg">
               {product.title}
             </h1>
           </div>
@@ -158,37 +158,6 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
                 {product.externalUrl && <ExternalLink className="w-5 h-5 ml-3 group-hover/btn:translate-x-1 transition-transform duration-300" />}
               </a>
             </Button>
-
-            {/* Garanties */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
-                <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-full">
-                  <Shield className="w-6 h-6 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm">Garantie 2 ans</p>
-                  <p className="text-xs text-muted-foreground">Protection complète</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
-                <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full">
-                  <Truck className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm">Livraison gratuite</p>
-                  <p className="text-xs text-muted-foreground">Sous 48h</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
-                <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full">
-                  <RotateCcw className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm">Retour 30 jours</p>
-                  <p className="text-xs text-muted-foreground">Satisfait ou remboursé</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -198,10 +167,10 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
         <div className="mt-20 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-16 rounded-3xl">
           <div className="max-w-5xl mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                Détails du produit
-              </h2>
-              <div className="w-24 h-1 bg-gradient-to-r from-purple-600 to-pink-600 mx-auto rounded-full"></div>
+            <h2 className="text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 bg-clip-text text-transparent drop-shadow-lg">
+              Détails du produit
+            </h2>
+              <div className="w-32 h-2 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 mx-auto rounded-full shadow-lg"></div>
               <p className="text-lg text-gray-600 dark:text-gray-300 mt-4 max-w-2xl mx-auto">
                 Découvrez tous les détails, caractéristiques et avantages de ce produit exceptionnel
               </p>
@@ -255,29 +224,29 @@ function ProductContent({ content }: { content: string }) {
   return (
     <div 
       className="max-w-none text-lg leading-relaxed
-        [&_h1]:text-4xl [&_h1]:lg:text-5xl [&_h1]:mb-8 [&_h1]:mt-12 [&_h1]:font-bold [&_h1]:bg-gradient-to-r [&_h1]:from-purple-600 [&_h1]:via-pink-600 [&_h1]:to-blue-600 [&_h1]:bg-clip-text [&_h1]:text-transparent [&_h1]:text-center
-        [&_h2]:text-3xl [&_h2]:lg:text-4xl [&_h2]:mb-6 [&_h2]:mt-10 [&_h2]:font-bold [&_h2]:bg-gradient-to-r [&_h2]:from-indigo-600 [&_h2]:via-purple-600 [&_h2]:to-pink-600 [&_h2]:bg-clip-text [&_h2]:text-transparent [&_h2]:border-l-4 [&_h2]:border-indigo-500 [&_h2]:pl-6 [&_h2]:py-2
-        [&_h3]:text-2xl [&_h3]:lg:text-3xl [&_h3]:mb-4 [&_h3]:mt-8 [&_h3]:font-semibold [&_h3]:text-emerald-600 dark:[&_h3]:text-emerald-400
-        [&_h4]:text-xl [&_h4]:lg:text-2xl [&_h4]:mb-3 [&_h4]:mt-6 [&_h4]:font-semibold [&_h4]:text-orange-600 dark:[&_h4]:text-orange-400 [&_h4]:bg-orange-50 dark:[&_h4]:bg-orange-900/20 [&_h4]:px-4 [&_h4]:py-2 [&_h4]:rounded-lg
-        [&_h5]:text-lg [&_h5]:lg:text-xl [&_h5]:mb-2 [&_h5]:mt-4 [&_h5]:font-semibold [&_h5]:text-blue-600 dark:[&_h5]:text-blue-400 [&_h5]:uppercase [&_h5]:tracking-wide
-        [&_h6]:text-base [&_h6]:lg:text-lg [&_h6]:mb-2 [&_h6]:mt-4 [&_h6]:font-semibold [&_h6]:text-gray-600 dark:[&_h6]:text-gray-400 [&_h6]:italic
-        [&_p]:text-gray-700 dark:[&_p]:text-gray-300 [&_p]:leading-relaxed [&_p]:mb-6 [&_p]:text-lg
-        [&_strong]:font-bold [&_strong]:text-gray-900 dark:[&_strong]:text-white [&_strong]:bg-yellow-100 dark:[&_strong]:bg-yellow-900/30 [&_strong]:px-2 [&_strong]:py-1 [&_strong]:rounded
-        [&_em]:italic [&_em]:text-gray-600 dark:[&_em]:text-gray-400 [&_em]:bg-blue-50 dark:[&_em]:bg-blue-900/20 [&_em]:px-2 [&_em]:py-1 [&_em]:rounded
-        [&_ul]:space-y-3 [&_ul]:my-8 [&_ul]:list-disc [&_ul]:pl-8
-        [&_li]:text-gray-700 dark:[&_li]:text-gray-300 [&_li]:leading-relaxed [&_li]:text-lg [&_li]:mb-2
-        [&_ol]:space-y-3 [&_ol]:my-8 [&_ol]:list-decimal [&_ol]:pl-8
-        [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:bg-gradient-to-r [&_blockquote]:from-gray-50 [&_blockquote]:to-gray-100 dark:[&_blockquote]:from-gray-800/50 dark:[&_blockquote]:to-gray-700/50 [&_blockquote]:px-8 [&_blockquote]:py-6 [&_blockquote]:rounded-r-xl [&_blockquote]:italic [&_blockquote]:my-8 [&_blockquote]:shadow-lg
-        [&_code]:bg-gray-900 dark:[&_code]:bg-gray-800 [&_code]:text-green-400 [&_code]:px-3 [&_code]:py-1 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono [&_code]:shadow-inner
-        [&_pre]:bg-gray-900 dark:[&_pre]:bg-gray-800 [&_pre]:text-green-400 [&_pre]:p-6 [&_pre]:rounded-xl [&_pre]:overflow-x-auto [&_pre]:my-8 [&_pre]:border [&_pre]:border-gray-700 [&_pre]:shadow-2xl
-        [&_table]:w-full [&_table]:my-8 [&_table]:border-collapse [&_table]:border [&_table]:border-gray-300 dark:[&_table]:border-gray-600 [&_table]:rounded-xl [&_table]:overflow-hidden [&_table]:shadow-xl
-        [&_th]:bg-gradient-to-r [&_th]:from-purple-600 [&_th]:to-pink-600 [&_th]:text-white [&_th]:font-bold [&_th]:border [&_th]:border-gray-300 dark:[&_th]:border-gray-600 [&_th]:px-6 [&_th]:py-4 [&_th]:text-left [&_th]:text-lg
-        [&_td]:border [&_td]:border-gray-300 dark:[&_td]:border-gray-600 [&_td]:px-6 [&_td]:py-4 [&_td]:text-gray-700 dark:[&_td]:text-gray-300 [&_td]:text-base
-        [&_a]:text-primary [&_a]:no-underline [&_a]:font-medium [&_a]:transition-colors [&_a]:hover:underline [&_a]:decoration-2 [&_a]:underline-offset-4
-        [&_hr]:border-none [&_hr]:h-1 [&_hr]:bg-gradient-to-r [&_hr]:from-transparent [&_hr]:via-purple-300 [&_hr]:to-transparent [&_hr]:my-12 [&_hr]:rounded-full
-        [&_img]:rounded-xl [&_img]:shadow-lg [&_img]:my-8 [&_img]:max-w-full [&_img]:h-auto [&_img]:mx-auto [&_img]:object-contain [&_img]:transition-transform [&_img]:hover:scale-105
-        [&_.image-gallery]:grid [&_.image-gallery]:grid-cols-2 [&_.image-gallery]:md:grid-cols-3 [&_.image-gallery]:lg:grid-cols-4 [&_.image-gallery]:gap-4 [&_.image-gallery]:my-8
-        [&_.image-gallery_img]:rounded-lg [&_.image-gallery_img]:shadow-md [&_.image-gallery_img]:cursor-pointer [&_.image-gallery_img]:transition-transform [&_.image-gallery_img]:hover:scale-105
+        [&_h1]:text-5xl [&_h1]:lg:text-6xl [&_h1]:mb-8 [&_h1]:mt-12 [&_h1]:font-black [&_h1]:bg-gradient-to-r [&_h1]:from-cyan-500 [&_h1]:via-blue-600 [&_h1]:to-purple-700 [&_h1]:bg-clip-text [&_h1]:text-transparent [&_h1]:text-center [&_h1]:drop-shadow-lg
+        [&_h2]:text-4xl [&_h2]:lg:text-5xl [&_h2]:mb-6 [&_h2]:mt-10 [&_h2]:font-bold [&_h2]:bg-gradient-to-r [&_h2]:from-emerald-500 [&_h2]:via-teal-600 [&_h2]:to-cyan-600 [&_h2]:bg-clip-text [&_h2]:text-transparent [&_h2]:border-l-4 [&_h2]:border-gradient-to-b [&_h2]:from-emerald-400 [&_h2]:to-teal-500 [&_h2]:pl-6 [&_h2]:py-3 [&_h2]:rounded-r-xl [&_h2]:bg-gradient-to-r [&_h2]:from-emerald-50 [&_h2]:to-teal-50 [&_h2]:dark:from-emerald-900/20 [&_h2]:dark:to-teal-900/20
+        [&_h3]:text-3xl [&_h3]:lg:text-4xl [&_h3]:mb-4 [&_h3]:mt-8 [&_h3]:font-bold [&_h3]:text-rose-500 [&_h3]:dark:text-rose-400 [&_h3]:bg-gradient-to-r [&_h3]:from-rose-50 [&_h3]:to-pink-50 [&_h3]:dark:from-rose-900/20 [&_h3]:dark:to-pink-900/20 [&_h3]:px-4 [&_h3]:py-2 [&_h3]:rounded-xl [&_h3]:shadow-sm
+        [&_h4]:text-2xl [&_h4]:lg:text-3xl [&_h4]:mb-3 [&_h4]:mt-6 [&_h4]:font-bold [&_h4]:text-amber-600 [&_h4]:dark:text-amber-400 [&_h4]:bg-gradient-to-r [&_h4]:from-amber-50 [&_h4]:to-yellow-50 [&_h4]:dark:from-amber-900/20 [&_h4]:dark:to-yellow-900/20 [&_h4]:px-4 [&_h4]:py-2 [&_h4]:rounded-lg [&_h4]:shadow-sm
+        [&_h5]:text-xl [&_h5]:lg:text-2xl [&_h5]:mb-2 [&_h5]:mt-4 [&_h5]:font-bold [&_h5]:text-violet-600 [&_h5]:dark:text-violet-400 [&_h5]:uppercase [&_h5]:tracking-wider [&_h5]:bg-gradient-to-r [&_h5]:from-violet-50 [&_h5]:to-purple-50 [&_h5]:dark:from-violet-900/20 [&_h5]:dark:to-purple-900/20 [&_h5]:px-3 [&_h5]:py-1 [&_h5]:rounded-lg
+        [&_h6]:text-lg [&_h6]:lg:text-xl [&_h6]:mb-2 [&_h6]:mt-4 [&_h6]:font-semibold [&_h6]:text-slate-600 [&_h6]:dark:text-slate-400 [&_h6]:italic [&_h6]:bg-slate-50 [&_h6]:dark:bg-slate-800/50 [&_h6]:px-3 [&_h6]:py-1 [&_h6]:rounded-md
+        [&_p]:text-slate-700 dark:[&_p]:text-slate-300 [&_p]:leading-relaxed [&_p]:mb-6 [&_p]:text-lg [&_p]:bg-gradient-to-r [&_p]:from-slate-50 [&_p]:to-gray-50 [&_p]:dark:from-slate-800/30 [&_p]:dark:to-gray-800/30 [&_p]:p-4 [&_p]:rounded-xl [&_p]:shadow-sm
+        [&_strong]:font-bold [&_strong]:text-cyan-700 [&_strong]:dark:text-cyan-300 [&_strong]:bg-gradient-to-r [&_strong]:from-cyan-100 [&_strong]:to-blue-100 [&_strong]:dark:from-cyan-900/30 [&_strong]:dark:to-blue-900/30 [&_strong]:px-3 [&_strong]:py-1 [&_strong]:rounded-lg [&_strong]:shadow-sm
+        [&_em]:italic [&_em]:text-emerald-600 [&_em]:dark:text-emerald-400 [&_em]:bg-gradient-to-r [&_em]:from-emerald-50 [&_em]:to-teal-50 [&_em]:dark:from-emerald-900/20 [&_em]:dark:to-teal-900/20 [&_em]:px-3 [&_em]:py-1 [&_em]:rounded-lg [&_em]:shadow-sm
+        [&_ul]:space-y-4 [&_ul]:my-8 [&_ul]:list-none [&_ul]:pl-0
+        [&_li]:text-slate-700 dark:[&_li]:text-slate-300 [&_li]:leading-relaxed [&_li]:text-lg [&_li]:mb-3 [&_li]:flex [&_li]:items-start [&_li]:gap-3 [&_li]:bg-gradient-to-r [&_li]:from-blue-50 [&_li]:to-indigo-50 [&_li]:dark:from-blue-900/20 [&_li]:dark:to-indigo-900/20 [&_li]:p-4 [&_li]:rounded-xl [&_li]:shadow-sm [&_li]:before:content-['✨'] [&_li]:before:text-yellow-500 [&_li]:before:text-xl [&_li]:before:flex-shrink-0
+        [&_ol]:space-y-4 [&_ol]:my-8 [&_ol]:list-none [&_ol]:pl-0
+        [&_blockquote]:border-l-4 [&_blockquote]:border-gradient-to-b [&_blockquote]:from-cyan-400 [&_blockquote]:to-blue-500 [&_blockquote]:bg-gradient-to-r [&_blockquote]:from-cyan-50 [&_blockquote]:to-blue-50 [&_blockquote]:dark:from-cyan-900/20 [&_blockquote]:dark:to-blue-900/20 [&_blockquote]:px-8 [&_blockquote]:py-6 [&_blockquote]:rounded-r-2xl [&_blockquote]:italic [&_blockquote]:my-8 [&_blockquote]:shadow-xl [&_blockquote]:backdrop-blur-sm
+        [&_code]:bg-gradient-to-r [&_code]:from-slate-900 [&_code]:to-gray-900 [&_code]:dark:from-slate-800 [&_code]:dark:to-gray-800 [&_code]:text-emerald-400 [&_code]:px-4 [&_code]:py-2 [&_code]:rounded-lg [&_code]:text-sm [&_code]:font-mono [&_code]:shadow-inner [&_code]:border [&_code]:border-emerald-500/20
+        [&_pre]:bg-gradient-to-r [&_pre]:from-slate-900 [&_pre]:to-gray-900 [&_pre]:dark:from-slate-800 [&_pre]:dark:to-gray-800 [&_pre]:text-emerald-400 [&_pre]:p-6 [&_pre]:rounded-2xl [&_pre]:overflow-x-auto [&_pre]:my-8 [&_pre]:border [&_pre]:border-emerald-500/20 [&_pre]:shadow-2xl [&_pre]:backdrop-blur-sm
+        [&_table]:w-full [&_table]:my-8 [&_table]:border-collapse [&_table]:rounded-2xl [&_table]:overflow-hidden [&_table]:shadow-2xl [&_table]:bg-white [&_table]:dark:bg-slate-800 [&_table]:border [&_table]:border-slate-200 [&_table]:dark:border-slate-700
+        [&_th]:bg-gradient-to-r [&_th]:from-indigo-600 [&_th]:via-purple-600 [&_th]:to-pink-600 [&_th]:text-white [&_th]:font-bold [&_th]:px-6 [&_th]:py-4 [&_th]:text-left [&_th]:text-lg [&_th]:shadow-lg
+        [&_td]:px-6 [&_td]:py-4 [&_td]:text-slate-700 [&_td]:dark:text-slate-300 [&_td]:text-base [&_td]:border-b [&_td]:border-slate-200 [&_td]:dark:border-slate-700 [&_td]:bg-gradient-to-r [&_td]:from-slate-50 [&_td]:to-gray-50 [&_td]:dark:from-slate-800/50 [&_td]:dark:to-gray-800/50
+        [&_a]:text-cyan-600 [&_a]:dark:text-cyan-400 [&_a]:no-underline [&_a]:font-semibold [&_a]:transition-all [&_a]:duration-300 [&_a]:hover:text-cyan-700 [&_a]:dark:hover:text-cyan-300 [&_a]:hover:underline [&_a]:decoration-2 [&_a]:underline-offset-4 [&_a]:bg-gradient-to-r [&_a]:from-cyan-50 [&_a]:to-blue-50 [&_a]:dark:from-cyan-900/20 [&_a]:dark:to-blue-900/20 [&_a]:px-2 [&_a]:py-1 [&_a]:rounded-lg [&_a]:hover:shadow-md
+        [&_hr]:border-none [&_hr]:h-2 [&_hr]:bg-gradient-to-r [&_hr]:from-transparent [&_hr]:via-cyan-400 [&_hr]:via-blue-500 [&_hr]:via-purple-500 [&_hr]:to-transparent [&_hr]:my-12 [&_hr]:rounded-full [&_hr]:shadow-lg
+        [&_img]:rounded-2xl [&_img]:shadow-xl [&_img]:my-8 [&_img]:max-w-full [&_img]:h-auto [&_img]:mx-auto [&_img]:object-contain [&_img]:transition-all [&_img]:duration-300 [&_img]:hover:scale-105 [&_img]:hover:shadow-2xl [&_img]:border [&_img]:border-slate-200 [&_img]:dark:border-slate-700
+        [&_.image-gallery]:grid [&_.image-gallery]:grid-cols-2 [&_.image-gallery]:md:grid-cols-3 [&_.image-gallery]:lg:grid-cols-4 [&_.image-gallery]:gap-6 [&_.image-gallery]:my-8 [&_.image-gallery]:p-6 [&_.image-gallery]:bg-gradient-to-r [&_.image-gallery]:from-slate-50 [&_.image-gallery]:to-gray-50 [&_.image-gallery]:dark:from-slate-800/30 [&_.image-gallery]:dark:to-gray-800/30 [&_.image-gallery]:rounded-2xl [&_.image-gallery]:shadow-lg
+        [&_.image-gallery_img]:rounded-xl [&_.image-gallery_img]:shadow-lg [&_.image-gallery_img]:cursor-pointer [&_.image-gallery_img]:transition-all [&_.image-gallery_img]:duration-300 [&_.image-gallery_img]:hover:scale-110 [&_.image-gallery_img]:hover:shadow-2xl [&_.image-gallery_img]:border [&_.image-gallery_img]:border-slate-200 [&_.image-gallery_img]:dark:border-slate-700
       "
       dangerouslySetInnerHTML={{ 
         __html: processedContent
