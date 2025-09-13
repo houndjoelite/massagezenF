@@ -294,7 +294,6 @@ function ProductContent({ content }: { content: string }) {
  */
 function processContentForGallery(content: string): string {
   // Détecter les groupes d'images consécutives avec regex
-  // Pattern pour détecter des images consécutives dans le même paragraphe ou div
   const imagePattern = /<img[^>]*>/gi
   const images = content.match(imagePattern) || []
   
@@ -302,37 +301,45 @@ function processContentForGallery(content: string): string {
     return content
   }
 
-  // Détecter les groupes d'images consécutives
   let processedContent = content
-  let imageIndex = 0
   
-  // Chercher les patterns d'images consécutives
-  const consecutiveImagePattern = /(<p[^>]*>.*?<img[^>]*>.*?<\/p>\s*){2,}/gi
-  const blockImagePattern = /(<div[^>]*>.*?<img[^>]*>.*?<\/div>\s*){2,}/gi
+  // Pattern pour détecter des images consécutives dans des paragraphes
+  const paragraphImagePattern = /<p[^>]*>.*?<img[^>]*>.*?<\/p>/gi
+  const paragraphMatches = content.match(paragraphImagePattern) || []
   
-  // Traiter les images dans des paragraphes consécutifs
-  processedContent = processedContent.replace(consecutiveImagePattern, (match) => {
-    const imgMatches = match.match(/<img[^>]*>/gi) || []
-    if (imgMatches.length >= 2) {
-      const galleryHtml = `<div class="image-gallery">${imgMatches.map(img => 
-        img.replace(/class="[^"]*"/, 'class="image-gallery_img"')
-      ).join('')}</div>`
-      return galleryHtml
-    }
-    return match
-  })
+  // Si on a au moins 2 paragraphes avec des images, les regrouper
+  if (paragraphMatches.length >= 2) {
+    // Trouver les paragraphes consécutifs avec des images
+    const consecutiveParagraphs = /(<p[^>]*>.*?<img[^>]*>.*?<\/p>\s*){2,}/gi
+    processedContent = processedContent.replace(consecutiveParagraphs, (match) => {
+      const imgMatches = match.match(/<img[^>]*>/gi) || []
+      if (imgMatches.length >= 2) {
+        const galleryHtml = `<div class="image-gallery">${imgMatches.map(img => 
+          img.replace(/class="[^"]*"/, 'class="image-gallery_img"')
+        ).join('')}</div>`
+        return galleryHtml
+      }
+      return match
+    })
+  }
   
-  // Traiter les images dans des divs consécutifs
-  processedContent = processedContent.replace(blockImagePattern, (match) => {
-    const imgMatches = match.match(/<img[^>]*>/gi) || []
-    if (imgMatches.length >= 2) {
-      const galleryHtml = `<div class="image-gallery">${imgMatches.map(img => 
-        img.replace(/class="[^"]*"/, 'class="image-gallery_img"')
-      ).join('')}</div>`
-      return galleryHtml
-    }
-    return match
-  })
+  // Pattern pour détecter des images consécutives dans des divs
+  const divImagePattern = /<div[^>]*>.*?<img[^>]*>.*?<\/div>/gi
+  const divMatches = content.match(divImagePattern) || []
+  
+  if (divMatches.length >= 2) {
+    const consecutiveDivs = /(<div[^>]*>.*?<img[^>]*>.*?<\/div>\s*){2,}/gi
+    processedContent = processedContent.replace(consecutiveDivs, (match) => {
+      const imgMatches = match.match(/<img[^>]*>/gi) || []
+      if (imgMatches.length >= 2) {
+        const galleryHtml = `<div class="image-gallery">${imgMatches.map(img => 
+          img.replace(/class="[^"]*"/, 'class="image-gallery_img"')
+        ).join('')}</div>`
+        return galleryHtml
+      }
+      return match
+    })
+  }
 
   return processedContent
 }
