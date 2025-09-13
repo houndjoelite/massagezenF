@@ -147,8 +147,9 @@ export function ProductGrid({
         >
           {products.map((product) => (
             <HoverEffect key={product.id} effect="lift" intensity="high">
-              <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 hover:scale-[1.03] rounded-3xl">
-              <CardContent className="p-0">
+              <Link href={`/produits/${product.slug}`} className="block">
+                <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 hover:scale-[1.03] rounded-3xl cursor-pointer">
+                <CardContent className="p-0">
                 <div className="relative aspect-square overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent z-10"></div>
                   {product.image ? (
@@ -234,23 +235,25 @@ export function ProductGrid({
                   <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
                     <Button 
                       className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group/btn" 
-                      asChild
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        if (product.externalUrl) {
+                          window.open(product.externalUrl, '_blank', 'noopener,noreferrer')
+                        } else {
+                          window.location.href = `/produits/${product.slug}`
+                        }
+                      }}
                     >
-                      <Link 
-                        href={product.externalUrl || `/produits/${product.slug}`} 
-                        target={product.externalUrl ? "_blank" : "_self"}
-                        rel={product.externalUrl ? "noopener noreferrer" : undefined}
-                        className="flex items-center justify-center"
-                      >
-                        <ShoppingCart className="w-5 h-5 mr-2 group-hover/btn:scale-110 transition-transform duration-300" />
-                        {product.buttonText}
-                        {product.externalUrl && <ExternalLink className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform duration-300" />}
-                      </Link>
+                      <ShoppingCart className="w-5 h-5 mr-2 group-hover/btn:scale-110 transition-transform duration-300" />
+                      {product.buttonText}
+                      {product.externalUrl && <ExternalLink className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform duration-300" />}
                     </Button>
                   </div>
                 </div>
               </CardContent>
               </Card>
+              </Link>
             </HoverEffect>
           ))}
         </AnimateList>
