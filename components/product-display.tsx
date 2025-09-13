@@ -276,16 +276,6 @@ function ProductContent({ content }: { content: string }) {
       "
       dangerouslySetInnerHTML={{ 
         __html: content
-          // Transformer les liens d'affiliation en boutons
-          .replace(/<a([^>]*href="[^"]*amazon[^"]*"[^>]*)>/gi, (match, attributes) => {
-            return `<a${attributes} class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 my-4 no-underline">`;
-          })
-          .replace(/<a([^>]*href="[^"]*shop[^"]*"[^>]*)>/gi, (match, attributes) => {
-            return `<a${attributes} class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 my-4 no-underline">`;
-          })
-          .replace(/<a([^>]*href="[^"]*buy[^"]*"[^>]*)>/gi, (match, attributes) => {
-            return `<a${attributes} class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 my-4 no-underline">`;
-          })
       }}
     />
   )

@@ -67,7 +67,7 @@ export async function generateMetadata({ params }: ProductPageProps) {
           title: product.title,
           description: product.excerpt || product.seo.description,
           images: product.image ? [product.image] : [],
-          type: 'product',
+          type: 'website',
         },
       }
     }
