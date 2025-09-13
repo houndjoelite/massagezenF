@@ -207,9 +207,9 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
               </p>
             </div>
             
-            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 lg:p-12 border border-gray-100 dark:border-gray-700">
-              <ProductContent content={product.content} />
-            </div>
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 lg:p-12 border border-gray-100 dark:border-gray-700">
+          <ProductContent content={product.content} />
+        </div>
           </div>
         </div>
       )}
@@ -254,30 +254,28 @@ function ProductContent({ content }: { content: string }) {
 
   return (
     <div 
-      className="prose prose-lg max-w-none
-        prose-headings:font-bold
-        prose-h1:text-4xl prose-h1:lg:text-5xl prose-h1:mb-8 prose-h1:mt-12 prose-h1:bg-gradient-to-r prose-h1:from-purple-600 prose-h1:via-pink-600 prose-h1:to-blue-600 prose-h1:bg-clip-text prose-h1:text-transparent prose-h1:text-center
-        prose-h2:text-3xl prose-h2:lg:text-4xl prose-h2:mb-6 prose-h2:mt-10 prose-h2:bg-gradient-to-r prose-h2:from-indigo-600 prose-h2:via-purple-600 prose-h2:to-pink-600 prose-h2:bg-clip-text prose-h2:text-transparent prose-h2:border-l-4 prose-h2:border-indigo-500 prose-h2:pl-6 prose-h2:py-2
-        prose-h3:text-2xl prose-h3:lg:text-3xl prose-h3:mb-4 prose-h3:mt-8 prose-h3:text-emerald-600 dark:prose-h3:text-emerald-400 prose-h3:font-semibold
-        prose-h4:text-xl prose-h4:lg:text-2xl prose-h4:mb-3 prose-h4:mt-6 prose-h4:text-orange-600 dark:prose-h4:text-orange-400 prose-h4:font-semibold prose-h4:bg-orange-50 dark:prose-h4:bg-orange-900/20 prose-h4:px-4 prose-h4:py-2 prose-h4:rounded-lg
-        prose-h5:text-lg prose-h5:lg:text-xl prose-h5:mb-2 prose-h5:mt-4 prose-h5:text-blue-600 dark:prose-h5:text-blue-400 prose-h5:font-semibold prose-h5:uppercase prose-h5:tracking-wide
-        prose-h6:text-base prose-h6:lg:text-lg prose-h6:mb-2 prose-h6:mt-4 prose-h6:text-gray-600 dark:prose-h6:text-gray-400 prose-h6:font-semibold prose-h6:italic
-        prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-6 prose-p:text-lg
-        prose-strong:font-bold prose-strong:text-gray-900 dark:prose-strong:text-white prose-strong:bg-yellow-100 dark:prose-strong:bg-yellow-900/30 prose-strong:px-2 prose-strong:py-1 prose-strong:rounded
-        prose-em:italic prose-em:text-gray-600 dark:prose-em:text-gray-400 prose-em:bg-blue-50 dark:prose-em:bg-blue-900/20 prose-em:px-2 prose-em:py-1 prose-em:rounded
-        prose-ul:space-y-3 prose-ul:my-8 prose-ul:list-disc prose-ul:pl-8
-        prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:leading-relaxed prose-li:text-lg prose-li:mb-2
-        prose-ol:space-y-3 prose-ol:my-8 prose-ol:list-decimal prose-ol:pl-8
-        prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-gradient-to-r prose-blockquote:from-gray-50 prose-blockquote:to-gray-100 dark:prose-blockquote:from-gray-800/50 dark:prose-blockquote:to-gray-700/50 prose-blockquote:px-8 prose-blockquote:py-6 prose-blockquote:rounded-r-xl prose-blockquote:italic prose-blockquote:my-8 prose-blockquote:shadow-lg
-        prose-code:bg-gray-900 dark:prose-code:bg-gray-800 prose-code:text-green-400 prose-code:px-3 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:shadow-inner
-        prose-pre:bg-gray-900 dark:prose-pre:bg-gray-800 prose-pre:text-green-400 prose-pre:p-6 prose-pre:rounded-xl prose-pre:overflow-x-auto prose-pre:my-8 prose-pre:border prose-pre:border-gray-700 prose-pre:shadow-2xl
-        prose-table:w-full prose-table:my-8 prose-table:border-collapse prose-table:border prose-table:border-gray-300 dark:prose-table:border-gray-600 prose-table:rounded-xl prose-table:overflow-hidden prose-table:shadow-xl
-        prose-th:bg-gradient-to-r prose-th:from-purple-600 prose-th:to-pink-600 prose-th:text-white prose-th:font-bold prose-th:border prose-th:border-gray-300 dark:prose-th:border-gray-600 prose-th:px-6 prose-th:py-4 prose-th:text-left prose-th:text-lg
-        prose-td:border prose-td:border-gray-300 dark:prose-td:border-gray-600 prose-td:px-6 prose-td:py-4 prose-td:text-gray-700 dark:prose-td:text-gray-300 prose-td:text-base
-        prose-a:text-primary prose-a:no-underline prose-a:font-medium prose-a:transition-colors prose-a:hover:underline prose-a:decoration-2 prose-a:underline-offset-4
-        prose-hr:border-none prose-hr:h-1 prose-hr:bg-gradient-to-r prose-hr:from-transparent prose-hr:via-purple-300 prose-hr:to-transparent prose-hr:my-12 prose-hr:rounded-full
+      className="max-w-none text-lg leading-relaxed
+        [&_h1]:text-4xl [&_h1]:lg:text-5xl [&_h1]:mb-8 [&_h1]:mt-12 [&_h1]:font-bold [&_h1]:bg-gradient-to-r [&_h1]:from-purple-600 [&_h1]:via-pink-600 [&_h1]:to-blue-600 [&_h1]:bg-clip-text [&_h1]:text-transparent [&_h1]:text-center
+        [&_h2]:text-3xl [&_h2]:lg:text-4xl [&_h2]:mb-6 [&_h2]:mt-10 [&_h2]:font-bold [&_h2]:bg-gradient-to-r [&_h2]:from-indigo-600 [&_h2]:via-purple-600 [&_h2]:to-pink-600 [&_h2]:bg-clip-text [&_h2]:text-transparent [&_h2]:border-l-4 [&_h2]:border-indigo-500 [&_h2]:pl-6 [&_h2]:py-2
+        [&_h3]:text-2xl [&_h3]:lg:text-3xl [&_h3]:mb-4 [&_h3]:mt-8 [&_h3]:font-semibold [&_h3]:text-emerald-600 dark:[&_h3]:text-emerald-400
+        [&_h4]:text-xl [&_h4]:lg:text-2xl [&_h4]:mb-3 [&_h4]:mt-6 [&_h4]:font-semibold [&_h4]:text-orange-600 dark:[&_h4]:text-orange-400 [&_h4]:bg-orange-50 dark:[&_h4]:bg-orange-900/20 [&_h4]:px-4 [&_h4]:py-2 [&_h4]:rounded-lg
+        [&_h5]:text-lg [&_h5]:lg:text-xl [&_h5]:mb-2 [&_h5]:mt-4 [&_h5]:font-semibold [&_h5]:text-blue-600 dark:[&_h5]:text-blue-400 [&_h5]:uppercase [&_h5]:tracking-wide
+        [&_h6]:text-base [&_h6]:lg:text-lg [&_h6]:mb-2 [&_h6]:mt-4 [&_h6]:font-semibold [&_h6]:text-gray-600 dark:[&_h6]:text-gray-400 [&_h6]:italic
+        [&_p]:text-gray-700 dark:[&_p]:text-gray-300 [&_p]:leading-relaxed [&_p]:mb-6 [&_p]:text-lg
+        [&_strong]:font-bold [&_strong]:text-gray-900 dark:[&_strong]:text-white [&_strong]:bg-yellow-100 dark:[&_strong]:bg-yellow-900/30 [&_strong]:px-2 [&_strong]:py-1 [&_strong]:rounded
+        [&_em]:italic [&_em]:text-gray-600 dark:[&_em]:text-gray-400 [&_em]:bg-blue-50 dark:[&_em]:bg-blue-900/20 [&_em]:px-2 [&_em]:py-1 [&_em]:rounded
+        [&_ul]:space-y-3 [&_ul]:my-8 [&_ul]:list-disc [&_ul]:pl-8
+        [&_li]:text-gray-700 dark:[&_li]:text-gray-300 [&_li]:leading-relaxed [&_li]:text-lg [&_li]:mb-2
+        [&_ol]:space-y-3 [&_ol]:my-8 [&_ol]:list-decimal [&_ol]:pl-8
+        [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:bg-gradient-to-r [&_blockquote]:from-gray-50 [&_blockquote]:to-gray-100 dark:[&_blockquote]:from-gray-800/50 dark:[&_blockquote]:to-gray-700/50 [&_blockquote]:px-8 [&_blockquote]:py-6 [&_blockquote]:rounded-r-xl [&_blockquote]:italic [&_blockquote]:my-8 [&_blockquote]:shadow-lg
+        [&_code]:bg-gray-900 dark:[&_code]:bg-gray-800 [&_code]:text-green-400 [&_code]:px-3 [&_code]:py-1 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono [&_code]:shadow-inner
+        [&_pre]:bg-gray-900 dark:[&_pre]:bg-gray-800 [&_pre]:text-green-400 [&_pre]:p-6 [&_pre]:rounded-xl [&_pre]:overflow-x-auto [&_pre]:my-8 [&_pre]:border [&_pre]:border-gray-700 [&_pre]:shadow-2xl
+        [&_table]:w-full [&_table]:my-8 [&_table]:border-collapse [&_table]:border [&_table]:border-gray-300 dark:[&_table]:border-gray-600 [&_table]:rounded-xl [&_table]:overflow-hidden [&_table]:shadow-xl
+        [&_th]:bg-gradient-to-r [&_th]:from-purple-600 [&_th]:to-pink-600 [&_th]:text-white [&_th]:font-bold [&_th]:border [&_th]:border-gray-300 dark:[&_th]:border-gray-600 [&_th]:px-6 [&_th]:py-4 [&_th]:text-left [&_th]:text-lg
+        [&_td]:border [&_td]:border-gray-300 dark:[&_td]:border-gray-600 [&_td]:px-6 [&_td]:py-4 [&_td]:text-gray-700 dark:[&_td]:text-gray-300 [&_td]:text-base
+        [&_a]:text-primary [&_a]:no-underline [&_a]:font-medium [&_a]:transition-colors [&_a]:hover:underline [&_a]:decoration-2 [&_a]:underline-offset-4
+        [&_hr]:border-none [&_hr]:h-1 [&_hr]:bg-gradient-to-r [&_hr]:from-transparent [&_hr]:via-purple-300 [&_hr]:to-transparent [&_hr]:my-12 [&_hr]:rounded-full
         [&_img]:rounded-xl [&_img]:shadow-lg [&_img]:my-8 [&_img]:max-w-full [&_img]:h-auto [&_img]:mx-auto [&_img]:object-contain [&_img]:transition-transform [&_img]:hover:scale-105
-        [&_a]:transition-all [&_a]:duration-300
         [&_.image-gallery]:grid [&_.image-gallery]:grid-cols-2 [&_.image-gallery]:md:grid-cols-3 [&_.image-gallery]:lg:grid-cols-4 [&_.image-gallery]:gap-4 [&_.image-gallery]:my-8
         [&_.image-gallery_img]:rounded-lg [&_.image-gallery_img]:shadow-md [&_.image-gallery_img]:cursor-pointer [&_.image-gallery_img]:transition-transform [&_.image-gallery_img]:hover:scale-105
       "
