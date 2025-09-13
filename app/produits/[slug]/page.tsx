@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, ShoppingCart, ExternalLink, Star, Truck, Shield, RotateCcw } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import { WordPressContent } from "@/components/wordpress-content"
+import { SimpleContent } from "@/components/simple-content"
 
 interface Product {
   id: string
@@ -347,9 +347,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
               
               <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 lg:p-12 border border-gray-100 dark:border-gray-700">
-                <WordPressContent 
+                <SimpleContent 
                   content={product.content}
-                  className="prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 dark:prose-strong:text-white"
                 />
               </div>
             </div>
