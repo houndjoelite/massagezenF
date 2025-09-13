@@ -1,47 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
-
 interface ProductGalleryProps {
   content: string
   className?: string
 }
 
 export function ProductGallery({ content, className = "" }: ProductGalleryProps) {
-  const [showLightbox, setShowLightbox] = useState(false)
-  const [currentImage, setCurrentImage] = useState<string>("")
-  const [currentAlt, setCurrentAlt] = useState<string>("")
-
-  // Écouter les événements de lightbox
-  useEffect(() => {
-    const handleOpenLightbox = (event: CustomEvent) => {
-      setCurrentImage(event.detail.src)
-      setCurrentAlt(event.detail.alt)
-      setShowLightbox(true)
-    }
-
-    window.addEventListener('openLightbox', handleOpenLightbox as EventListener)
-    
-    return () => {
-      window.removeEventListener('openLightbox', handleOpenLightbox as EventListener)
-    }
-  }, [])
-
-  const handleImageClick = (src: string, alt: string) => {
-    setCurrentImage(src)
-    setCurrentAlt(alt)
-    setShowLightbox(true)
-  }
-
-  const closeLightbox = () => {
-    setShowLightbox(false)
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') closeLightbox()
-  }
-
   return (
     <div className={`product-content-wrapper ${className}`}>
       <div 
@@ -68,69 +32,13 @@ export function ProductGallery({ content, className = "" }: ProductGalleryProps)
           prose-tr:hover:bg-gray-50
           prose-a:text-blue-600 prose-a:underline prose-a:font-medium prose-a:transition-colors prose-a:hover:text-blue-800
           prose-hr:border-none prose-hr:h-0.5 prose-hr:bg-gradient-to-r prose-hr:from-transparent prose-hr:via-gray-300 prose-hr:to-transparent prose-hr:my-8
-          [&_img]:rounded-lg [&_img]:shadow-md [&_img]:my-6 [&_img]:max-w-full [&_img]:h-auto [&_img]:mx-auto [&_img]:object-contain [&_img]:cursor-pointer [&_img]:transition-transform [&_img]:hover:scale-105
+          [&_img]:rounded-lg [&_img]:shadow-md [&_img]:my-6 [&_img]:max-w-full [&_img]:h-auto [&_img]:mx-auto [&_img]:object-contain
           [&_a]:inline-flex [&_a]:items-center [&_a]:gap-2 [&_a]:px-6 [&_a]:py-3 [&_a]:bg-gradient-to-r [&_a]:from-orange-500 [&_a]:to-red-600 [&_a]:text-white [&_a]:font-semibold [&_a]:rounded-lg [&_a]:shadow-lg [&_a]:transition-all [&_a]:duration-300 [&_a]:my-4 [&_a]:no-underline [&_a]:hover:shadow-xl [&_a]:hover:-translate-y-0.5
         "
         dangerouslySetInnerHTML={{ 
           __html: content
-            .replace(/<img([^>]*)>/gi, (match, attributes) => {
-              // Extraire src et alt des attributs
-              const srcMatch = attributes.match(/src="([^"]*)"/);
-              const altMatch = attributes.match(/alt="([^"]*)"/);
-              const src = srcMatch ? srcMatch[1] : '';
-              const alt = altMatch ? altMatch[1] : 'Image';
-              
-              return `<img${attributes} onclick="window.openImageLightbox('${src}', '${alt}')" style="cursor: pointer;" />`;
-            })
-            .replace(/<a([^>]*href="[^"]*amazon[^"]*"[^>]*)>/gi, (match, attributes) => {
-              return `<a${attributes} class="affiliate-button">`;
-            })
-            .replace(/<a([^>]*href="[^"]*shop[^"]*"[^>]*)>/gi, (match, attributes) => {
-              return `<a${attributes} class="affiliate-button">`;
-            })
-            .replace(/<a([^>]*href="[^"]*buy[^"]*"[^>]*)>/gi, (match, attributes) => {
-              return `<a${attributes} class="affiliate-button">`;
-            })
         }}
       />
-      
-      {/* Lightbox */}
-      {showLightbox && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
-          onClick={closeLightbox}
-          onKeyDown={handleKeyDown}
-          tabIndex={0}
-        >
-          <div className="relative max-w-6xl max-h-full">
-            <button
-              onClick={closeLightbox}
-              className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
-            >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            <Image
-              src={currentImage}
-              alt={currentAlt}
-              width={800}
-              height={600}
-              className="max-w-full max-h-full object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-        </div>
-      )}
     </div>
   )
-}
-
-// Fonction globale pour ouvrir la lightbox
-if (typeof window !== 'undefined') {
-  (window as any).openImageLightbox = (src: string, alt: string) => {
-    const event = new CustomEvent('openLightbox', { detail: { src, alt } });
-    window.dispatchEvent(event);
-  };
 }
