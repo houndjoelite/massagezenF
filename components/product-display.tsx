@@ -246,39 +246,95 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
 
 /**
  * Composant pour afficher le contenu HTML du produit
- * Gère les tableaux, listes, paragraphes, etc.
+ * Gère les tableaux, listes, paragraphes, galeries d'images, etc.
  */
 function ProductContent({ content }: { content: string }) {
+  // Traiter le contenu pour détecter et transformer les blocs d'images en galerie
+  const processedContent = processContentForGallery(content)
+
   return (
     <div 
       className="prose prose-lg max-w-none
-        prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white
-        prose-h1:text-3xl prose-h1:lg:text-4xl prose-h1:mb-6 prose-h1:mt-8
-        prose-h2:text-2xl prose-h2:lg:text-3xl prose-h2:mb-4 prose-h2:mt-6 prose-h2:border-l-4 prose-h2:border-primary prose-h2:pl-4
-        prose-h3:text-xl prose-h3:lg:text-2xl prose-h3:mb-3 prose-h3:mt-5
-        prose-h4:text-lg prose-h4:lg:text-xl prose-h4:mb-2 prose-h4:mt-4
-        prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-4
-        prose-strong:font-bold prose-strong:text-gray-900 dark:prose-strong:text-white
-        prose-em:italic prose-em:text-gray-600 dark:prose-em:text-gray-400
-        prose-ul:space-y-2 prose-ul:my-6 prose-ul:list-disc prose-ul:pl-6
-        prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:leading-relaxed
-        prose-ol:space-y-2 prose-ol:my-6 prose-ol:list-decimal prose-ol:pl-6
-        prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-gray-50 dark:prose-blockquote:bg-gray-800/50 prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-blockquote:my-6
-        prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:text-gray-900 dark:prose-code:text-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-mono
-        prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-pre:text-gray-900 dark:prose-pre:text-gray-100 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-pre:my-6
-        prose-table:w-full prose-table:my-6 prose-table:border-collapse prose-table:border prose-table:border-gray-300 dark:prose-table:border-gray-600 prose-table:rounded-lg prose-table:overflow-hidden
-        prose-th:bg-gray-100 dark:prose-th:bg-gray-700 prose-th:font-semibold prose-th:border prose-th:border-gray-300 dark:prose-th:border-gray-600 prose-th:px-4 prose-th:py-2 prose-th:text-left
-        prose-td:border prose-td:border-gray-300 dark:prose-td:border-gray-600 prose-td:px-4 prose-td:py-2 prose-td:text-gray-700 dark:prose-td:text-gray-300
-        prose-a:text-primary prose-a:no-underline prose-a:font-medium prose-a:transition-colors prose-a:hover:underline
-        prose-hr:border-none prose-hr:h-0.5 prose-hr:bg-gradient-to-r prose-hr:from-transparent prose-hr:via-gray-300 prose-hr:to-transparent prose-hr:my-8
-        [&_img]:rounded-lg [&_img]:shadow-md [&_img]:my-6 [&_img]:max-w-full [&_img]:h-auto [&_img]:mx-auto [&_img]:object-contain
+        prose-headings:font-bold
+        prose-h1:text-4xl prose-h1:lg:text-5xl prose-h1:mb-8 prose-h1:mt-12 prose-h1:bg-gradient-to-r prose-h1:from-purple-600 prose-h1:via-pink-600 prose-h1:to-blue-600 prose-h1:bg-clip-text prose-h1:text-transparent prose-h1:text-center
+        prose-h2:text-3xl prose-h2:lg:text-4xl prose-h2:mb-6 prose-h2:mt-10 prose-h2:bg-gradient-to-r prose-h2:from-indigo-600 prose-h2:via-purple-600 prose-h2:to-pink-600 prose-h2:bg-clip-text prose-h2:text-transparent prose-h2:border-l-4 prose-h2:border-indigo-500 prose-h2:pl-6 prose-h2:py-2
+        prose-h3:text-2xl prose-h3:lg:text-3xl prose-h3:mb-4 prose-h3:mt-8 prose-h3:text-emerald-600 dark:prose-h3:text-emerald-400 prose-h3:font-semibold
+        prose-h4:text-xl prose-h4:lg:text-2xl prose-h4:mb-3 prose-h4:mt-6 prose-h4:text-orange-600 dark:prose-h4:text-orange-400 prose-h4:font-semibold prose-h4:bg-orange-50 dark:prose-h4:bg-orange-900/20 prose-h4:px-4 prose-h4:py-2 prose-h4:rounded-lg
+        prose-h5:text-lg prose-h5:lg:text-xl prose-h5:mb-2 prose-h5:mt-4 prose-h5:text-blue-600 dark:prose-h5:text-blue-400 prose-h5:font-semibold prose-h5:uppercase prose-h5:tracking-wide
+        prose-h6:text-base prose-h6:lg:text-lg prose-h6:mb-2 prose-h6:mt-4 prose-h6:text-gray-600 dark:prose-h6:text-gray-400 prose-h6:font-semibold prose-h6:italic
+        prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-6 prose-p:text-lg
+        prose-strong:font-bold prose-strong:text-gray-900 dark:prose-strong:text-white prose-strong:bg-yellow-100 dark:prose-strong:bg-yellow-900/30 prose-strong:px-2 prose-strong:py-1 prose-strong:rounded
+        prose-em:italic prose-em:text-gray-600 dark:prose-em:text-gray-400 prose-em:bg-blue-50 dark:prose-em:bg-blue-900/20 prose-em:px-2 prose-em:py-1 prose-em:rounded
+        prose-ul:space-y-3 prose-ul:my-8 prose-ul:list-disc prose-ul:pl-8
+        prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:leading-relaxed prose-li:text-lg prose-li:mb-2
+        prose-ol:space-y-3 prose-ol:my-8 prose-ol:list-decimal prose-ol:pl-8
+        prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-gradient-to-r prose-blockquote:from-gray-50 prose-blockquote:to-gray-100 dark:prose-blockquote:from-gray-800/50 dark:prose-blockquote:to-gray-700/50 prose-blockquote:px-8 prose-blockquote:py-6 prose-blockquote:rounded-r-xl prose-blockquote:italic prose-blockquote:my-8 prose-blockquote:shadow-lg
+        prose-code:bg-gray-900 dark:prose-code:bg-gray-800 prose-code:text-green-400 prose-code:px-3 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:shadow-inner
+        prose-pre:bg-gray-900 dark:prose-pre:bg-gray-800 prose-pre:text-green-400 prose-pre:p-6 prose-pre:rounded-xl prose-pre:overflow-x-auto prose-pre:my-8 prose-pre:border prose-pre:border-gray-700 prose-pre:shadow-2xl
+        prose-table:w-full prose-table:my-8 prose-table:border-collapse prose-table:border prose-table:border-gray-300 dark:prose-table:border-gray-600 prose-table:rounded-xl prose-table:overflow-hidden prose-table:shadow-xl
+        prose-th:bg-gradient-to-r prose-th:from-purple-600 prose-th:to-pink-600 prose-th:text-white prose-th:font-bold prose-th:border prose-th:border-gray-300 dark:prose-th:border-gray-600 prose-th:px-6 prose-th:py-4 prose-th:text-left prose-th:text-lg
+        prose-td:border prose-td:border-gray-300 dark:prose-td:border-gray-600 prose-td:px-6 prose-td:py-4 prose-td:text-gray-700 dark:prose-td:text-gray-300 prose-td:text-base
+        prose-a:text-primary prose-a:no-underline prose-a:font-medium prose-a:transition-colors prose-a:hover:underline prose-a:decoration-2 prose-a:underline-offset-4
+        prose-hr:border-none prose-hr:h-1 prose-hr:bg-gradient-to-r prose-hr:from-transparent prose-hr:via-purple-300 prose-hr:to-transparent prose-hr:my-12 prose-hr:rounded-full
+        [&_img]:rounded-xl [&_img]:shadow-lg [&_img]:my-8 [&_img]:max-w-full [&_img]:h-auto [&_img]:mx-auto [&_img]:object-contain [&_img]:transition-transform [&_img]:hover:scale-105
         [&_a]:transition-all [&_a]:duration-300
+        [&_.image-gallery]:grid [&_.image-gallery]:grid-cols-2 [&_.image-gallery]:md:grid-cols-3 [&_.image-gallery]:lg:grid-cols-4 [&_.image-gallery]:gap-4 [&_.image-gallery]:my-8
+        [&_.image-gallery_img]:rounded-lg [&_.image-gallery_img]:shadow-md [&_.image-gallery_img]:cursor-pointer [&_.image-gallery_img]:transition-transform [&_.image-gallery_img]:hover:scale-105
       "
       dangerouslySetInnerHTML={{ 
-        __html: content
+        __html: processedContent
       }}
     />
   )
+}
+
+/**
+ * Traite le contenu pour détecter et transformer les blocs d'images en galerie
+ * Fonctionne côté serveur et client
+ */
+function processContentForGallery(content: string): string {
+  // Détecter les groupes d'images consécutives avec regex
+  // Pattern pour détecter des images consécutives dans le même paragraphe ou div
+  const imagePattern = /<img[^>]*>/gi
+  const images = content.match(imagePattern) || []
+  
+  if (images.length < 2) {
+    return content
+  }
+
+  // Détecter les groupes d'images consécutives
+  let processedContent = content
+  let imageIndex = 0
+  
+  // Chercher les patterns d'images consécutives
+  const consecutiveImagePattern = /(<p[^>]*>.*?<img[^>]*>.*?<\/p>\s*){2,}/gi
+  const blockImagePattern = /(<div[^>]*>.*?<img[^>]*>.*?<\/div>\s*){2,}/gi
+  
+  // Traiter les images dans des paragraphes consécutifs
+  processedContent = processedContent.replace(consecutiveImagePattern, (match) => {
+    const imgMatches = match.match(/<img[^>]*>/gi) || []
+    if (imgMatches.length >= 2) {
+      const galleryHtml = `<div class="image-gallery">${imgMatches.map(img => 
+        img.replace(/class="[^"]*"/, 'class="image-gallery_img"')
+      ).join('')}</div>`
+      return galleryHtml
+    }
+    return match
+  })
+  
+  // Traiter les images dans des divs consécutifs
+  processedContent = processedContent.replace(blockImagePattern, (match) => {
+    const imgMatches = match.match(/<img[^>]*>/gi) || []
+    if (imgMatches.length >= 2) {
+      const galleryHtml = `<div class="image-gallery">${imgMatches.map(img => 
+        img.replace(/class="[^"]*"/, 'class="image-gallery_img"')
+      ).join('')}</div>`
+      return galleryHtml
+    }
+    return match
+  })
+
+  return processedContent
 }
 
 /**
