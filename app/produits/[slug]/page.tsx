@@ -42,7 +42,8 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export async function generateMetadata({ params }: ProductPageProps) {
-  const { slug } = await params
+  const resolvedParams = await params
+  const { slug } = resolvedParams
   
   try {
     // Utiliser l'URL absolue pour la production
@@ -85,7 +86,8 @@ export async function generateMetadata({ params }: ProductPageProps) {
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const { slug } = await params
+  const resolvedParams = await params
+  const { slug } = resolvedParams
   let product: Product | null = null
   let error: string | null = null
 
