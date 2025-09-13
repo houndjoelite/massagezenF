@@ -1,44 +1,155 @@
 "use client"
 
+import { useState } from "react"
+import Image from "next/image"
+import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react"
+
 interface ProductGalleryProps {
-  content: string
+  images: string[]
+  alt: string
   className?: string
 }
 
-export function ProductGallery({ content, className = "" }: ProductGalleryProps) {
+/**
+ * Composant galerie d'images pour les produits
+ * Affiche les images en galerie horizontale responsive
+ * Inclut une lightbox pour voir les images en grand
+ */
+export function ProductGallery({ images, alt, className = "" }: ProductGalleryProps) {
+  const [selectedImage, setSelectedImage] = useState(0)
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false)
+
+  // Si pas d'images, ne rien afficher
+  if (!images || images.length === 0) {
+    return null
+  }
+
+  // Si une seule image, l'afficher simplement
+  if (images.length === 1) {
+    return (
+      <div className={`product-gallery-single ${className}`}>
+        <div className="relative aspect-square overflow-hidden rounded-2xl shadow-lg group cursor-pointer"
+             onClick={() => setIsLightboxOpen(true)}>
+          <Image
+            src={images[0]}
+            alt={alt}
+            width={600}
+            height={600}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            priority
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+            <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Galerie avec plusieurs images
   return (
-    <div className={`product-content-wrapper ${className}`}>
-      <div 
-        className="prose prose-xl max-w-none
-          prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white
-          prose-h1:text-4xl prose-h1:font-extrabold prose-h1:text-center prose-h1:bg-gradient-to-r prose-h1:from-purple-600 prose-h1:to-pink-600 prose-h1:bg-clip-text prose-h1:text-transparent
-          prose-h2:text-3xl prose-h2:font-bold prose-h2:bg-gradient-to-r prose-h2:from-pink-500 prose-h2:to-red-500 prose-h2:bg-clip-text prose-h2:text-transparent prose-h2:border-l-4 prose-h2:border-pink-500 prose-h2:pl-4
-          prose-h3:text-2xl prose-h3:font-semibold prose-h3:text-green-600
-          prose-h4:text-xl prose-h4:font-semibold prose-h4:text-red-600 prose-h4:bg-yellow-100 prose-h4:px-4 prose-h4:py-2 prose-h4:rounded-lg prose-h4:border-l-4 prose-h4:border-red-500
-          prose-h5:text-lg prose-h5:font-semibold prose-h5:text-purple-600 prose-h5:uppercase prose-h5:tracking-wide
-          prose-h6:text-base prose-h6:font-semibold prose-h6:text-blue-600 prose-h6:italic
-          prose-p:text-lg prose-p:leading-relaxed prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:text-justify
-          prose-strong:font-bold prose-strong:text-gray-900 dark:prose-strong:text-white prose-strong:bg-yellow-100 prose-strong:px-1 prose-strong:py-0.5 prose-strong:rounded
-          prose-em:italic prose-em:text-gray-600 prose-em:bg-blue-100 prose-em:px-1 prose-em:py-0.5 prose-em:rounded
-          prose-ul:space-y-2 prose-ul:my-6
-          prose-li:text-lg prose-li:leading-relaxed prose-li:text-gray-700 dark:prose-li:text-gray-300
-          prose-ol:space-y-2 prose-ol:my-6
-          prose-blockquote:bg-gradient-to-r prose-blockquote:from-gray-50 prose-blockquote:to-gray-100 prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:italic prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:rounded-lg prose-blockquote:my-8
-          prose-code:bg-gray-900 prose-code:text-white prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-mono
-          prose-pre:bg-gray-900 prose-pre:text-white prose-pre:p-6 prose-pre:rounded-xl prose-pre:overflow-x-auto prose-pre:my-6 prose-pre:border prose-pre:border-gray-700
-          prose-table:w-full prose-table:my-8 prose-table:bg-white prose-table:rounded-xl prose-table:overflow-hidden prose-table:shadow-lg
-          prose-th:bg-gradient-to-r prose-th:from-purple-600 prose-th:to-pink-600 prose-th:text-white prose-th:p-4 prose-th:font-semibold prose-th:text-left
-          prose-td:p-4 prose-td:border-b prose-td:border-gray-200 prose-td:text-gray-700
-          prose-tr:hover:bg-gray-50
-          prose-a:text-blue-600 prose-a:underline prose-a:font-medium prose-a:transition-colors prose-a:hover:text-blue-800
-          prose-hr:border-none prose-hr:h-0.5 prose-hr:bg-gradient-to-r prose-hr:from-transparent prose-hr:via-gray-300 prose-hr:to-transparent prose-hr:my-8
-          [&_img]:rounded-lg [&_img]:shadow-md [&_img]:my-6 [&_img]:max-w-full [&_img]:h-auto [&_img]:mx-auto [&_img]:object-contain
-          [&_a]:inline-flex [&_a]:items-center [&_a]:gap-2 [&_a]:px-6 [&_a]:py-3 [&_a]:bg-gradient-to-r [&_a]:from-orange-500 [&_a]:to-red-600 [&_a]:text-white [&_a]:font-semibold [&_a]:rounded-lg [&_a]:shadow-lg [&_a]:transition-all [&_a]:duration-300 [&_a]:my-4 [&_a]:no-underline [&_a]:hover:shadow-xl [&_a]:hover:-translate-y-0.5
-        "
-        dangerouslySetInnerHTML={{ 
-          __html: content
-        }}
-      />
-    </div>
+    <>
+      <div className={`product-gallery-multiple ${className}`}>
+        {/* Image principale */}
+        <div className="relative aspect-square overflow-hidden rounded-2xl shadow-lg mb-4 group cursor-pointer"
+             onClick={() => setIsLightboxOpen(true)}>
+          <Image
+            src={images[selectedImage]}
+            alt={`${alt} - Image ${selectedImage + 1}`}
+            width={600}
+            height={600}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            priority
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+            <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </div>
+        </div>
+
+        {/* Miniatures */}
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {images.map((image, index) => (
+            <button
+              key={index}
+              onClick={() => setSelectedImage(index)}
+              className={`relative aspect-square w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 transition-all duration-200 ${
+                selectedImage === index 
+                  ? 'ring-2 ring-primary shadow-lg' 
+                  : 'hover:shadow-md opacity-70 hover:opacity-100'
+              }`}
+            >
+              <Image
+                src={image}
+                alt={`${alt} - Miniature ${index + 1}`}
+                width={80}
+                height={80}
+                className="w-full h-full object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Lightbox */}
+      {isLightboxOpen && (
+        <div 
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          <div className="relative max-w-6xl max-h-full">
+            {/* Bouton fermer */}
+            <button
+              onClick={() => setIsLightboxOpen(false)}
+              className="absolute top-4 right-4 text-white hover:text-gray-300 z-10 bg-black/50 rounded-full p-2"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Bouton précédent */}
+            {images.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setSelectedImage(selectedImage > 0 ? selectedImage - 1 : images.length - 1)
+                }}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10 bg-black/50 rounded-full p-2"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+            )}
+
+            {/* Bouton suivant */}
+            {images.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setSelectedImage(selectedImage < images.length - 1 ? selectedImage + 1 : 0)
+                }}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10 bg-black/50 rounded-full p-2"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            )}
+
+            {/* Image en grand */}
+            <Image
+              src={images[selectedImage]}
+              alt={`${alt} - Image ${selectedImage + 1}`}
+              width={800}
+              height={600}
+              className="max-w-full max-h-full object-contain rounded-lg"
+              onClick={(e) => e.stopPropagation()}
+            />
+
+            {/* Indicateur d'image */}
+            {images.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm bg-black/50 rounded-full px-3 py-1">
+                {selectedImage + 1} / {images.length}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   )
 }

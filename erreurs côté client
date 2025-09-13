@@ -1,0 +1,3 @@
+[33mb21c97b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: Corriger l'erreur côté client dans les pages produits
+[33md669814[m fix: create ultra-simple ProductGallery to eliminate client-side errors
+[33me77723c[m fix: simplify ProductGallery component to resolve server-side rendering error
