@@ -332,31 +332,48 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         {/* Contenu détaillé */}
         {product.content && (
-          <div className="mt-20">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl lg:text-4xl font-bold mb-8 text-center bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
-                Détails du produit
-              </h2>
-              <ProductGallery 
-                content={product.content}
-                className="prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 dark:prose-strong:text-white"
-              />
+          <div className="mt-20 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-16">
+            <div className="max-w-5xl mx-auto px-4">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+                  Détails du produit
+                </h2>
+                <div className="w-24 h-1 bg-gradient-to-r from-purple-600 to-pink-600 mx-auto rounded-full"></div>
+                <p className="text-lg text-gray-600 dark:text-gray-300 mt-4 max-w-2xl mx-auto">
+                  Découvrez tous les détails, caractéristiques et avantages de ce produit exceptionnel
+                </p>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 lg:p-12 border border-gray-100 dark:border-gray-700">
+                <ProductGallery 
+                  content={product.content}
+                  className="product-details-content"
+                />
+              </div>
             </div>
           </div>
         )}
 
         {/* Tags */}
         {product.tags.length > 0 && (
-          <div className="mt-16">
-            <div className="max-w-4xl mx-auto">
-              <h3 className="text-2xl font-bold mb-6 text-center">Mots-clés</h3>
-              <div className="flex flex-wrap gap-3 justify-center">
+          <div className="mt-20 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 py-16">
+            <div className="max-w-4xl mx-auto px-4">
+              <div className="text-center mb-12">
+                <h3 className="text-3xl lg:text-4xl font-bold mb-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  Mots-clés associés
+                </h3>
+                <p className="text-lg text-gray-600 dark:text-gray-300">
+                  Explorez les termes liés à ce produit
+                </p>
+              </div>
+              
+              <div className="flex flex-wrap gap-4 justify-center">
                 {product.tags.map((tag, index) => (
                   <Badge 
                     key={index} 
-                    className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:from-primary/10 hover:to-primary/5 hover:border-primary/20 transition-all duration-300 px-4 py-2 text-sm font-medium"
+                    className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-3 text-sm font-semibold rounded-full hover:scale-105 transform"
                   >
-                    {tag}
+                    #{tag}
                   </Badge>
                 ))}
               </div>
