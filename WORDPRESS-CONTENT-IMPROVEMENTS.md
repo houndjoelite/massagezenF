@@ -134,3 +134,4 @@ Vos articles WordPress ont maintenant :
 - **Design responsive** sur tous les appareils
 - **Mode sombre** automatique
 
+
