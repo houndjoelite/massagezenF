@@ -42,8 +42,7 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export async function generateMetadata({ params }: ProductPageProps) {
-  const resolvedParams = await params
-  const { slug } = resolvedParams
+  const { slug } = await params
   
   try {
     // Utiliser l'URL absolue pour la production
@@ -86,8 +85,7 @@ export async function generateMetadata({ params }: ProductPageProps) {
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const resolvedParams = await params
-  const { slug } = resolvedParams
+  const { slug } = await params
   let product: Product | null = null
   let error: string | null = null
 
@@ -347,9 +345,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
               
               <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 lg:p-12 border border-gray-100 dark:border-gray-700">
-                <SimpleContent 
-                  content={product.content}
-                />
+                {product.content ? (
+                  <SimpleContent 
+                    content={product.content}
+                  />
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                    Aucun contenu détaillé disponible pour ce produit.
+                  </p>
+                )}
               </div>
             </div>
           </div>
