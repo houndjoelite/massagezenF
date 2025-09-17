@@ -92,7 +92,7 @@ export default function PolitiqueConfidentialitePage() {
                 <p>Nous ne partageons vos données personnelles qu'avec :</p>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                   <li>
-                    <strong>Notre hébergeur (o2switch) :</strong> Pour assurer le fonctionnement du site
+                    <strong>Notre hébergeur (Vercel) :</strong> Pour assurer le fonctionnement technique du site
                   </li>
                   <li>
                     <strong>Services d'analyse (Google Analytics) :</strong> Données anonymisées uniquement
