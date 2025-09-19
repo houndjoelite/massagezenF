@@ -35,7 +35,9 @@ export default function MentionsLegalesPage() {
                 <CardTitle>Hébergement</CardTitle>
               </CardHeader>
               <CardContent>
-<p>Ce site est hébergé par o2switch, 222-224 Boulevard Gustave Flaubert, 63000 Clermont-Ferrand, France.</p>
+                <p>
+                  Ce site est hébergé par <strong>Vercel Inc.</strong>, 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis.
+                </p>
               </CardContent>
             </Card>
 
@@ -86,12 +88,12 @@ export default function MentionsLegalesPage() {
                   différentes périodes de l'année, mais peut toutefois contenir des inexactitudes ou des omissions.
                 </p>
                 <p>
-                  Si vous constatez une lacune, erreur ou ce qui parait être un dysfonctionnement, merci de bien vouloir
+                  Si vous constatez une lacune, erreur ou ce qui paraît être un dysfonctionnement, merci de bien vouloir
                   le signaler par email à contact@monappareildemassage.com.
                 </p>
                 <p>
                   L'utilisateur du site s'engage à accéder au site en utilisant un matériel récent, ne contenant pas de
-                  virus et avec un navigateur de dernière génération mis-à-jour.
+                  virus et avec un navigateur de dernière génération mis à jour.
                 </p>
               </CardContent>
             </Card>
