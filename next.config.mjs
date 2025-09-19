@@ -33,9 +33,7 @@ const nextConfig = {
     ],
   },
   // Configuration pour les pages dynamiques
-  experimental: {
-    serverComponentsExternalPackages: [],
-  },
+  serverExternalPackages: [],
   // Headers pour CORS
   async headers() {
     return [

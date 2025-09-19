@@ -25,6 +25,8 @@ export async function GET(
       excerpt: product.short_description || "Aucun résumé disponible",
       content: product.description || "",
       image: product.images && product.images.length > 0 ? product.images[0].src : null,
+      // Récupérer TOUTES les images de la galerie WooCommerce
+      galleryImages: product.images ? product.images.map((img: any) => img.src) : [],
       price: product.price || "0",
       regularPrice: product.regular_price && product.regular_price !== product.price ? product.regular_price : undefined,
       currency: product.currency || "€",

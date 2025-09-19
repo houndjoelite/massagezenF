@@ -13,6 +13,7 @@ interface Product {
   excerpt: string
   content: string
   image: string | null
+  galleryImages?: string[] // Images de la galerie WooCommerce
   price: string
   regularPrice?: string
   currency: string
