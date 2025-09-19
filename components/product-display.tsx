@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Star, ShoppingCart, ExternalLink, CheckCircle } from "lucide-react"
 import { ProductGallery } from "./product-gallery"
+import { SimilarProducts } from "./similar-products"
 import "./product-display.css"
 
 interface Product {
@@ -73,167 +74,153 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
 
   return (
     <div className={`product-display ${className}`}>
-      {/* Section principale du produit */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-        
-        {/* Galerie d'images */}
-        <div className="space-y-6">
-          <ProductGallery 
-            images={galleryImages}
-            alt={product.title}
-            className="w-full"
-          />
-        </div>
-
-        {/* Informations du produit */}
-        <div className="space-y-8">
+      {/* Section principale du produit - Design simplifié */}
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           
-          {/* Titre et catégories */}
-          <div className="space-y-6">
-            {/* Catégories */}
-            {product.categories && product.categories.length > 0 && (
-              <div className="flex flex-wrap gap-3">
-                {product.categories.map((category, index) => (
-                  <Badge 
-                    key={index} 
-                    className="bg-gradient-to-r from-primary to-primary/80 text-white border-0 px-4 py-2 text-sm font-medium shadow-lg"
-                  >
-                    {category}
-                  </Badge>
-                ))}
-              </div>
-            )}
-            
-            {/* Titre principal */}
-            <h1 className="text-5xl lg:text-6xl font-black text-balance leading-tight bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-700 bg-clip-text text-transparent drop-shadow-lg">
-              {product.title}
-            </h1>
+          {/* Galerie d'images */}
+          <div>
+            <ProductGallery 
+              images={galleryImages}
+              alt={product.title}
+              className="w-full"
+            />
           </div>
 
-          {/* Prix et évaluation */}
+          {/* Informations du produit */}
           <div className="space-y-6">
-            {/* Prix */}
-            <div className="flex items-center gap-6">
-              <span className="text-4xl font-bold text-primary">
-                {product.price} {product.currency}
-              </span>
-              {product.regularPrice && product.regularPrice !== product.price && (
-                <div className="space-y-1">
-                  <span className="text-xl text-muted-foreground line-through block">
-                    {product.regularPrice} {product.currency}
+            
+            {/* Titre et catégories */}
+            <div>
+              {/* Catégories */}
+              {product.categories && product.categories.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {product.categories.map((category, index) => (
+                    <span 
+                      key={index} 
+                      className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
+                    >
+                      {category}
+                    </span>
+                  ))}
+                </div>
+              )}
+              
+              {/* Titre principal */}
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                {product.title}
+              </h1>
+            </div>
+
+            {/* Prix et évaluation */}
+            <div className="space-y-4">
+              {/* Prix */}
+              <div className="flex items-center gap-4">
+                <span className="text-3xl font-bold text-primary">
+                  {product.price} {product.currency}
+                </span>
+                {product.regularPrice && product.regularPrice !== product.price && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg text-gray-500 line-through">
+                      {product.regularPrice} {product.currency}
+                    </span>
+                    <span className="bg-red-100 text-red-800 text-sm px-2 py-1 rounded">
+                      -{Math.round(((parseFloat(product.regularPrice) - parseFloat(product.price)) / parseFloat(product.regularPrice)) * 100)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Évaluation */}
+              {product.averageRating > 0 && (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-5 h-5 ${
+                          i < Math.floor(product.averageRating) 
+                            ? "text-yellow-400" 
+                            : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm text-gray-600">
+                    {product.averageRating.toFixed(1)} ({product.ratingCount} avis)
                   </span>
-                  <Badge className="bg-red-500 text-white text-sm font-bold">
-                    -{Math.round(((parseFloat(product.regularPrice) - parseFloat(product.price)) / parseFloat(product.regularPrice)) * 100)}%
-                  </Badge>
                 </div>
               )}
             </div>
 
-            {/* Évaluation */}
-            {product.averageRating > 0 && (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-6 h-6 ${
-                        i < Math.floor(product.averageRating) 
-                          ? "fill-yellow-400 text-yellow-400" 
-                          : "text-gray-300 dark:text-gray-600"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className="text-lg font-semibold">{product.averageRating.toFixed(1)}</span>
-                <span className="text-muted-foreground">
-                  ({product.ratingCount} avis)
-                </span>
+            {/* Description courte */}
+            {product.excerpt && (
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">Description</h2>
+                <div 
+                  className="text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: product.excerpt }}
+                />
               </div>
             )}
-          </div>
 
-          {/* Description courte */}
-          {product.excerpt && (
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Description</h2>
-              <div 
-                className="text-lg text-muted-foreground leading-relaxed prose prose-p:text-muted-foreground prose-p:leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: product.excerpt }}
-              />
-            </div>
-          )}
-
-          {/* Bouton d'achat et garanties */}
-          <div className="space-y-8">
-            {/* Bouton d'achat principal */}
-            <Button 
-              size="lg" 
-              className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-semibold py-4 text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 group/btn" 
-              asChild
-              disabled={product.stockStatus !== "instock"}
-            >
-              <a 
-                href={product.externalUrl || "#"}
-                target={product.externalUrl ? "_blank" : "_self"}
-                rel={product.externalUrl ? "noopener noreferrer" : undefined}
-                className="flex items-center justify-center"
+            {/* Bouton d'achat */}
+            <div className="pt-4">
+              <Button 
+                size="lg" 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 text-lg" 
+                asChild
+                disabled={product.stockStatus !== "instock"}
               >
-                <ShoppingCart className="w-6 h-6 mr-3 group-hover/btn:scale-110 transition-transform duration-300" />
-                {product.buttonText}
-                {product.externalUrl && <ExternalLink className="w-5 h-5 ml-3 group-hover/btn:translate-x-1 transition-transform duration-300" />}
-              </a>
-            </Button>
+                <a 
+                  href={product.externalUrl || "#"}
+                  target={product.externalUrl ? "_blank" : "_self"}
+                  rel={product.externalUrl ? "noopener noreferrer" : undefined}
+                  className="flex items-center justify-center"
+                >
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  {product.buttonText}
+                  {product.externalUrl && <ExternalLink className="w-4 h-4 ml-2" />}
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Contenu détaillé du produit */}
       {product.content && (
-        <div className="mt-12 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 rounded-3xl">
-          <div className="max-w-5xl mx-auto px-4">
-            <div className="text-center mb-8">
-            <h2 className="text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 bg-clip-text text-transparent drop-shadow-lg">
-              Détails du produit
-            </h2>
-              <div className="w-32 h-2 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 mx-auto rounded-full shadow-lg"></div>
-              <p className="text-lg text-gray-600 dark:text-gray-300 mt-4 max-w-2xl mx-auto">
-                Découvrez tous les détails, caractéristiques et avantages de ce produit exceptionnel
-              </p>
-            </div>
-            
-        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 lg:p-12 border border-gray-100 dark:border-gray-700">
-          <ProductContent content={product.content} />
-        </div>
+        <div className="max-w-6xl mx-auto mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Détails du produit</h2>
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <ProductContent content={product.content} />
           </div>
         </div>
       )}
 
       {/* Tags */}
       {product.tags && product.tags.length > 0 && (
-        <div className="mt-20 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 py-16 rounded-3xl">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="text-center mb-12">
-              <h3 className="text-3xl lg:text-4xl font-bold mb-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Mots-clés associés
-              </h3>
-              <p className="text-lg text-gray-600 dark:text-gray-300">
-                Explorez les termes liés à ce produit
-              </p>
-            </div>
-            
-            <div className="flex flex-wrap gap-4 justify-center">
-              {product.tags.map((tag, index) => (
-                <Badge 
-                  key={index} 
-                  className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-3 text-sm font-semibold rounded-full hover:scale-105 transform"
-                >
-                  #{tag}
-                </Badge>
-              ))}
-            </div>
+        <div className="max-w-6xl mx-auto mt-12">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">Mots-clés associés</h3>
+          <div className="flex flex-wrap gap-2">
+            {product.tags.map((tag, index) => (
+              <span 
+                key={index} 
+                className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
+              >
+                #{tag}
+              </span>
+            ))}
           </div>
         </div>
       )}
+
+      {/* Produits similaires */}
+      <SimilarProducts 
+        currentProductId={product.id}
+        categories={product.categories}
+        limit={4}
+      />
     </div>
   )
 }
