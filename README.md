@@ -21,38 +21,6 @@ L'objectif est d'aider les visiteurs à faire le meilleur choix d'appareil de ma
 
 ---
 
-## Structure du projet
-
-massagezenF/
-  public/             # Fichiers statiques
-    images/           # Images du site
-    favicon.ico       # Favicon
-  src/
-    composants/       # Composants réutilisables
-      common/         # Composants génériques
-      layout/         # Composants de mise en page
-      ui/             # Éléments d'interface
-    pages/            # Pages du site
-    produits/         # Pages produits
-    blog/             # Articles de blog
-    api/              # Routes API
-    styles/           # Feuilles de style
-      globals.css     # Styles globaux
-      theme/          # Variables et thèmes
-    lib/              # Utilitaires et configurations
-      api/            # Appels API
-      utils/          # Fonctions utilitaires
-        types/        # Définitions TypeScript
-  .gitignore
-  package.json
-  tsconfig.json
-  next.config.js
-  README.md
-
-
-
----
-
 ## Technologies Principales
 
 - **Frontend** : Next.js 13+ (React), TypeScript, Tailwind CSS, SWR  
