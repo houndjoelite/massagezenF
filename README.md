@@ -227,7 +227,7 @@ Ou connectez directement votre dépôt GitHub sur [vercel.com](https://vercel.co
 **HoundjoElite**
 
 - 🐙 GitHub: [@houndjoelite](https://github.com/houndjoelite)
-- 📧 Email: houndjojeanjacques82.com
+- 📧 Email: houndjojeanjacques82@gmail.com
 - 🌐 Site web: (https://monappareildemassage.com)
 
 ---
