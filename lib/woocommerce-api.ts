@@ -8,8 +8,8 @@ const WORDPRESS_DOMAINS = {
 
 // Clés API WooCommerce
 const WOOCOMMERCE_KEYS = {
-  consumerKey: process.env.WOOCOMMERCE_CONSUMER_KEY || "ck_a33bb68de87fa336c3d4a452714fa736f8272eb2",
-  consumerSecret: process.env.WOOCOMMERCE_CONSUMER_SECRET || "cs_25dccf2cf701a3539e39e5e8c578d3a5c28c4d88"
+  consumerKey: process.env.WOOCOMMERCE_CONSUMER_KEY || "ck_44f5f8e48598a280db1fcd56ea38234aa0d1f7fa,
+  consumerSecret: process.env.WOOCOMMERCE_CONSUMER_SECRET || "cs_32c35bf32fcd85e8342e06c07a72762f539fdda8"
 }
 
 // Fonction pour encoder les clés en base64
