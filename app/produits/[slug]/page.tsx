@@ -6,6 +6,19 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { ProductDisplay } from "@/components/product-display"
 
+const categorySlugMapping: Record<string, string> = {
+  'pistolets-de-massage-musculaire': 'pistolets-massage',
+  'massage-des-pieds': 'pieds',
+  'massage-pour-le-dos-et-la-nuque': 'dos-nuque',
+  'appareils-de-pressotherapie': 'pressotherapie',
+  'massage-de-la-tete-et-cuir-chevelu': 'tete-cuir-chevelu',
+  'appareils-de-massage-oculaires': 'massage-oculaire',
+  'appareils-de-massage-pour-les-jambes-et-mollets': 'jambes-mollets',
+  'appareils-de-massage-multifonctions': 'multifonctions',
+  'coussinets-et-ceintures-de-massage': 'coussinets-ceintures',
+  'massage-des-mains': 'mains',
+  'fauteuils-de-massage': 'fauteuils-de-massage',
+}
 interface Category {
   id: number
   name: string
