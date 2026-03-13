@@ -19,10 +19,12 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const exclude = searchParams.get('exclude') || ''
   const limit = searchParams.get('limit') || '5'
+  const category = searchParams.get('category') || ''
 
   try {
+    const categoryParam = category ? `&category=${category}` : ''
     const response = await fetchWooCommerce(
-      `/products?per_page=${limit}&exclude=${exclude}&status=publish&orderby=date&order=desc`
+      `/products?per_page=${limit}&exclude=${exclude}&status=publish&orderby=date&order=desc${categoryParam}`
     )
     const products = await response.json()
 
