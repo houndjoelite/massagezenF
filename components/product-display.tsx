@@ -6,6 +6,12 @@ import { ProductGallery } from "./product-gallery"
 import { SimilarProducts } from "./similar-products"
 import "./product-display.css"
 
+interface Category {
+  id: number
+  name: string
+  slug: string
+}
+
 interface Product {
   id: string
   title: string
@@ -13,7 +19,7 @@ interface Product {
   excerpt: string
   content: string
   image: string | null
-  galleryImages?: string[] // Images de la galerie WooCommerce
+  galleryImages?: string[]
   price: string
   regularPrice?: string
   currency: string
@@ -22,7 +28,7 @@ interface Product {
   ratingCount: number
   externalUrl: string | null
   buttonText: string
-  categories: string[]
+  categories: Array<string | Category>
   tags: string[]
   seo: {
     title: string
@@ -36,35 +42,24 @@ interface ProductDisplayProps {
   className?: string
 }
 
-/**
- * Composant principal d'affichage d'une fiche produit
- * Compatible avec Next.js Server Components
- * Affiche toutes les informations du produit de manière moderne et responsive
- */
 export function ProductDisplay({ product, className = "" }: ProductDisplayProps) {
-  // Image mise en avant (priorité: image principale du produit)
   const featuredImage = product.image || (product.galleryImages && product.galleryImages[0]) || null
   
-  // Galerie d'images (toutes les images sauf celle mise en avant)
   const wooCommerceImages = product.galleryImages || []
   const contentImages = extractImagesFromContent(product.content)
   
-  // Combiner toutes les images pour la galerie
   const allGalleryImages = [...wooCommerceImages, ...contentImages]
   
-  // Filtrer les images valides et éviter les doublons
   const validGalleryImages = allGalleryImages.filter((img, index, arr) => 
     img && 
     img.trim() !== '' && 
     arr.indexOf(img) === index &&
     (img.startsWith('http') || img.startsWith('/') || img.startsWith('./') || img.startsWith('../')) &&
-    img !== featuredImage // Exclure l'image mise en avant
+    img !== featuredImage
   )
   
-  // Images pour la galerie (image mise en avant + galerie)
   const galleryImages = featuredImage ? [featuredImage, ...validGalleryImages] : validGalleryImages
   
-  // Debug: afficher les images trouvées (temporaire)
   if (process.env.NODE_ENV === 'development') {
     console.log('Image mise en avant:', featuredImage)
     console.log('Images WooCommerce galerie:', wooCommerceImages)
@@ -72,9 +67,12 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
     console.log('Images de galerie finale:', galleryImages)
   }
 
+  const getCategoryName = (category: string | Category): string => {
+    return typeof category === 'object' ? category.name : category
+  }
+
   return (
     <div className={`product-display ${className}`}>
-      {/* Section principale du produit - Design simplifié */}
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           
@@ -92,7 +90,6 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
             
             {/* Titre et catégories */}
             <div>
-              {/* Catégories */}
               {product.categories && product.categories.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {product.categories.map((category, index) => (
@@ -100,13 +97,12 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
                       key={index} 
                       className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
                     >
-                      {category}
+                      {getCategoryName(category)}
                     </span>
                   ))}
                 </div>
               )}
               
-              {/* Titre principal */}
               <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                 {product.title}
               </h1>
@@ -114,7 +110,6 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
 
             {/* Prix et évaluation */}
             <div className="space-y-4">
-              {/* Prix */}
               <div className="flex items-center gap-4">
                 <span className="text-3xl font-bold text-primary">
                   {product.price} {product.currency}
@@ -131,7 +126,6 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
                 )}
               </div>
 
-              {/* Évaluation */}
               {product.averageRating > 0 && (
                 <div className="flex items-center gap-2">
                   <div className="flex items-center">
@@ -188,7 +182,7 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
         </div>
       </div>
 
-      {/* Contenu détaillé du produit */}
+      {/* Contenu détaillé */}
       {product.content && (
         <div className="max-w-6xl mx-auto mt-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Détails du produit</h2>
@@ -218,50 +212,33 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
       {/* Produits similaires */}
       <SimilarProducts 
         currentProductId={product.id}
-        categories={product.categories}
+        categories={product.categories.map(getCategoryName)}
         limit={4}
       />
     </div>
   )
 }
 
-/**
- * Composant pour afficher le contenu HTML du produit
- * Gère les tableaux, listes, paragraphes, galeries d'images, etc.
- */
 function ProductContent({ content }: { content: string }) {
-  // Traiter le contenu pour détecter et transformer les blocs d'images en galerie
   const processedContent = processContentForGallery(content)
-
   return (
     <div 
       className="product-content"
-      dangerouslySetInnerHTML={{ 
-        __html: processedContent
-      }}
+      dangerouslySetInnerHTML={{ __html: processedContent }}
     />
   )
 }
 
-/**
- * Traite le contenu pour détecter et transformer les blocs d'images en galerie
- * Fonctionne côté serveur et client
- * Améliorée pour mieux détecter les galeries d'images
- */
 function processContentForGallery(content: string): string {
   if (!content) return content
   
-  // Détecter les groupes d'images consécutives avec regex
   const imagePattern = /<img[^>]*>/gi
   const images = content.match(imagePattern) || []
   
-  if (images.length < 2) {
-    return content
-  }
+  if (images.length < 2) return content
 
   let processedContent = content
   
-  // 1. Détecter les images consécutives dans des paragraphes
   const paragraphImagePattern = /<p[^>]*>.*?<img[^>]*>.*?<\/p>/gi
   const paragraphMatches = content.match(paragraphImagePattern) || []
   
@@ -270,16 +247,14 @@ function processContentForGallery(content: string): string {
     processedContent = processedContent.replace(consecutiveParagraphs, (match) => {
       const imgMatches = match.match(/<img[^>]*>/gi) || []
       if (imgMatches.length >= 2) {
-        const galleryHtml = `<div class="image-gallery">${imgMatches.map(img => 
+        return `<div class="image-gallery">${imgMatches.map(img => 
           img.replace(/class="[^"]*"/, 'class="image-gallery_img"')
         ).join('')}</div>`
-        return galleryHtml
       }
       return match
     })
   }
   
-  // 2. Détecter les images consécutives dans des divs
   const divImagePattern = /<div[^>]*>.*?<img[^>]*>.*?<\/div>/gi
   const divMatches = content.match(divImagePattern) || []
   
@@ -288,37 +263,32 @@ function processContentForGallery(content: string): string {
     processedContent = processedContent.replace(consecutiveDivs, (match) => {
       const imgMatches = match.match(/<img[^>]*>/gi) || []
       if (imgMatches.length >= 2) {
-        const galleryHtml = `<div class="image-gallery">${imgMatches.map(img => 
+        return `<div class="image-gallery">${imgMatches.map(img => 
           img.replace(/class="[^"]*"/, 'class="image-gallery_img"')
         ).join('')}</div>`
-        return galleryHtml
       }
       return match
     })
   }
 
-  // 3. Détecter les images consécutives même sans conteneurs spécifiques
   const consecutiveImagesPattern = /(<img[^>]*>\s*){2,}/gi
   processedContent = processedContent.replace(consecutiveImagesPattern, (match) => {
     const imgMatches = match.match(/<img[^>]*>/gi) || []
     if (imgMatches.length >= 2) {
-      const galleryHtml = `<div class="image-gallery">${imgMatches.map(img => 
+      return `<div class="image-gallery">${imgMatches.map(img => 
         img.replace(/class="[^"]*"/, 'class="image-gallery_img"')
       ).join('')}</div>`
-      return galleryHtml
     }
     return match
   })
 
-  // 4. Détecter les images séparées par du texte court (moins de 50 caractères)
   const imagesWithShortText = /<img[^>]*>[\s\S]{1,50}<img[^>]*>/gi
   processedContent = processedContent.replace(imagesWithShortText, (match) => {
     const imgMatches = match.match(/<img[^>]*>/gi) || []
     if (imgMatches.length >= 2) {
-      const galleryHtml = `<div class="image-gallery">${imgMatches.map(img => 
+      return `<div class="image-gallery">${imgMatches.map(img => 
         img.replace(/class="[^"]*"/, 'class="image-gallery_img"')
       ).join('')}</div>`
-      return galleryHtml
     }
     return match
   })
@@ -326,18 +296,13 @@ function processContentForGallery(content: string): string {
   return processedContent
 }
 
-/**
- * Fonction utilitaire pour extraire les images du contenu HTML
- * Améliorée pour gérer différents formats d'URLs et éviter les doublons
- */
 function extractImagesFromContent(content: string): string[] {
   if (!content) return []
   
-  // Patterns multiples pour capturer différents formats d'images
   const imgPatterns = [
-    /<img[^>]+src="([^"]+)"/gi,  // src="url"
-    /<img[^>]+src='([^']+)'/gi,  // src='url'
-    /<img[^>]+src=([^\s>]+)/gi,  // src=url (sans guillemets)
+    /<img[^>]+src="([^"]+)"/gi,
+    /<img[^>]+src='([^']+)'/gi,
+    /<img[^>]+src=([^\s>]+)/gi,
   ]
   
   const images: string[] = []
@@ -347,11 +312,7 @@ function extractImagesFromContent(content: string): string[] {
     while ((match = pattern.exec(content)) !== null) {
       if (match[1]) {
         let imageUrl = match[1].trim()
-        
-        // Nettoyer l'URL (enlever les guillemets restants)
         imageUrl = imageUrl.replace(/^["']|["']$/g, '')
-        
-        // Vérifier que c'est une URL valide
         if (imageUrl && 
             (imageUrl.startsWith('http') || 
              imageUrl.startsWith('/') || 
