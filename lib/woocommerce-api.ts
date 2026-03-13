@@ -145,3 +145,14 @@ export async function getProductBySlug(slug: string): Promise<any | null> {
 if (process.env.NODE_ENV === 'development') {
   process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"
 }
+
+// Fonction pour récupérer les produits similaires
+export async function getRelatedProducts(productId: number, limit: number = 4): Promise<any[]> {
+  try {
+    const response = await fetchWooCommerce(`/products?per_page=${limit}&exclude=${productId}&status=publish&orderby=rand`)
+    return await response.json()
+  } catch (error) {
+    console.error("Erreur lors de la récupération des produits similaires:", error)
+    return []
+  }
+}
