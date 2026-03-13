@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Header from "@/components/header"
@@ -13,7 +14,7 @@ interface Product {
   excerpt: string
   content: string
   image: string | null
-  galleryImages?: string[] // Images de la galerie WooCommerce
+  galleryImages?: string[]
   price: string
   regularPrice?: string
   currency: string
@@ -35,34 +36,26 @@ interface ProductPageProps {
   params: Promise<{ slug: string }>
 }
 
-// Configuration pour le rendu dynamique
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export async function generateMetadata({ params }: ProductPageProps) {
   const { slug } = await params
-  
   try {
-    // Utiliser l'URL absolue pour la production
-    const baseUrl = process.env.NODE_ENV === 'production' 
+    const baseUrl = process.env.NODE_ENV === 'production'
       ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
       : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-    
-    const response = await fetch(
-      `${baseUrl}/api/wordpress/products/${slug}`,
-      {
-        cache: "no-store",
-        headers: {
-          'User-Agent': 'MassageZen/1.0',
-        }
-      }
-    )
+
+    const response = await fetch(`${baseUrl}/api/wordpress/products/${slug}`, {
+      cache: "no-store",
+      headers: { 'User-Agent': 'MassageZen/1.0' }
+    })
 
     if (response.ok) {
       const product: Product = await response.json()
       return {
         title: `${product.title} | MassageZen`,
-        description: product.excerpt || product.seo.description || `Découvrez ${product.title} - ${product.price} ${product.currency}`,
+        description: product.excerpt || product.seo.description,
         keywords: product.seo.keywords.join(", "),
         openGraph: {
           title: product.title,
@@ -85,39 +78,38 @@ export async function generateMetadata({ params }: ProductPageProps) {
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params
   let product: Product | null = null
+  let relatedProducts: Product[] = []
   let error: string | null = null
 
-  try {
-    // Utiliser l'URL absolue pour la production
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
-      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-    
-    console.log(`Fetching product ${slug} from ${baseUrl}`)
-    
-    const response = await fetch(
-      `${baseUrl}/api/wordpress/products/${slug}`,
-      {
-        cache: "no-store",
-        headers: {
-          'User-Agent': 'MassageZen/1.0',
-        }
-      }
-    )
+  const baseUrl = process.env.NODE_ENV === 'production'
+    ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
+    : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
 
-    console.log(`Response status for product ${slug}: ${response.status}`)
+  try {
+    const response = await fetch(`${baseUrl}/api/wordpress/products/${slug}`, {
+      cache: "no-store",
+      headers: { 'User-Agent': 'MassageZen/1.0' }
+    })
 
     if (response.ok) {
       product = await response.json()
-      console.log(`Product ${slug} loaded successfully:`, product?.title)
+
+      // Récupérer les produits similaires via l'API
+      if (product?.id) {
+        const relatedResponse = await fetch(
+          `${baseUrl}/api/wordpress/products/related?exclude=${product.id}&limit=4`,
+          { cache: "no-store" }
+        )
+        if (relatedResponse.ok) {
+          relatedProducts = await relatedResponse.json()
+        }
+      }
     } else {
       const errorData = await response.json().catch(() => ({}))
-      error = errorData.error || `HTTP ${response.status}: ${response.statusText}`
-      console.error(`Failed to fetch product ${slug}:`, error)
+      error = errorData.error || `HTTP ${response.status}`
     }
   } catch (err) {
     error = err instanceof Error ? err.message : 'Unknown error'
-    console.error(`Error fetching product ${slug}:`, err)
   }
 
   if (!product) {
@@ -129,14 +121,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <p className="text-muted-foreground mb-8">
             {error ? `Erreur: ${error}` : "Ce produit n'existe pas ou a été supprimé."}
           </p>
-          <div className="space-y-4">
-            <Button asChild>
-              <Link href="/categories">Retour aux catégories</Link>
-            </Button>
-            <div className="text-sm text-muted-foreground">
-              Slug recherché: <code className="bg-gray-100 px-2 py-1 rounded">{slug}</code>
-            </div>
-          </div>
+          <Button asChild>
+            <Link href="/categories">Retour aux catégories</Link>
+          </Button>
         </main>
         <Footer />
       </div>
@@ -146,7 +133,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <div className="min-h-screen">
       <Header />
-      
+
       <main className="container mx-auto px-4 py-12">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-8">
@@ -158,23 +145,51 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </nav>
 
         {/* Bouton retour */}
-        <Button 
-          variant="outline" 
-          asChild 
-          className="mb-12 group/back hover:bg-primary/5 transition-all duration-300"
-        >
+        <Button variant="outline" asChild className="mb-12 group/back hover:bg-primary/5 transition-all duration-300">
           <Link href="/categories" className="flex items-center">
             <ArrowLeft className="w-4 h-4 mr-2 group-hover/back:-translate-x-1 transition-transform duration-300" />
             Retour aux catégories
           </Link>
         </Button>
 
-        {/* Composant principal d'affichage du produit */}
+        {/* Produit principal */}
         <ProductDisplay product={product} />
+
+        {/* Produits similaires */}
+        {relatedProducts.length > 0 && (
+          <section className="mt-20">
+            <h2 className="text-2xl font-bold mb-8">Produits similaires</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {relatedProducts.map((related) => (
+                <Link
+                  key={related.id}
+                  href={`/produits/${related.slug}`}
+                  className="group border rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                >
+                  {related.image && (
+                    <div className="relative h-48 w-full overflow-hidden">
+                      <Image
+                        src={related.image}
+                        alt={related.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <h3 className="font-semibold text-sm line-clamp-2 mb-2 group-hover:text-primary transition-colors">
+                      {related.title}
+                    </h3>
+                    <p className="text-primary font-bold">{related.price} {related.currency}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       <Footer />
     </div>
   )
 }
-
