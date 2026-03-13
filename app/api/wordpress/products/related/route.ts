@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchWooCommerce } from '@/lib/api/woocommerce-api'
+import { fetchWooCommerce } from '@/lib/woocommerce-api'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
