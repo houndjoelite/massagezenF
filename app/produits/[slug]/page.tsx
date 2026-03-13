@@ -1,5 +1,5 @@
-import { notFound } from "next/navigation"
-import Link from "next/link"
+Voici le fichier complet corrigé :
+tsximport Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
@@ -30,6 +30,17 @@ interface Product {
     description: string
     keywords: string[]
   }
+}
+
+interface RelatedProduct {
+  id: string
+  title: string
+  slug: string
+  image: string | null
+  price: string
+  currency: string
+  categorySlug: string
+  categoryName: string
 }
 
 interface ProductPageProps {
@@ -78,7 +89,7 @@ export async function generateMetadata({ params }: ProductPageProps) {
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params
   let product: Product | null = null
-  let relatedProducts: Product[] = []
+  let relatedProducts: RelatedProduct[] = []
   let error: string | null = null
 
   const baseUrl = process.env.NODE_ENV === 'production'
@@ -94,10 +105,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
     if (response.ok) {
       product = await response.json()
 
-      // Récupérer les produits similaires via l'API
       if (product?.id) {
+        const categoryId = product.categories?.[0] || ''
         const relatedResponse = await fetch(
-          `${baseUrl}/api/wordpress/products/related?exclude=${product.id}&limit=4`,
+          `${baseUrl}/api/wordpress/products/related?exclude=${product.id}&limit=5&category=${categoryId}`,
           { cache: "no-store" }
         )
         if (relatedResponse.ok) {
@@ -135,6 +146,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <Header />
 
       <main className="container mx-auto px-4 py-12">
+
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-8">
           <Link href="/" className="hover:text-primary transition-colors">Accueil</Link>
@@ -159,7 +171,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {relatedProducts.length > 0 && (
           <section className="mt-20">
             <h2 className="text-2xl font-bold mb-8">Produits similaires</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
               {relatedProducts.map((related) => (
                 <Link
                   key={related.id}
@@ -185,8 +197,21 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </Link>
               ))}
             </div>
+
+            {/* Lien vers la catégorie */}
+            {relatedProducts[0]?.categorySlug && (
+              <div className="mt-8 text-center">
+                <Link
+                  href={`/categories/${relatedProducts[0].categorySlug}`}
+                  className="inline-flex items-center px-6 py-3 border border-primary text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 font-medium"
+                >
+                  Voir tous les produits de cette catégorie →
+                </Link>
+              </div>
+            )}
           </section>
         )}
+
       </main>
 
       <Footer />
