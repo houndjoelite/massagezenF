@@ -104,16 +104,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
     if (response.ok) {
       product = await response.json()
 
-      if (product?.id) {
-        const categoryId = product.categories?.[0] || ''
-        const relatedResponse = await fetch(
-          `${baseUrl}/api/wordpress/products/related?exclude=${product.id}&limit=5&category=${categoryId}`,
-          { cache: "no-store" }
-        )
-        if (relatedResponse.ok) {
-          relatedProducts = await relatedResponse.json()
-        }
-      }
+    if (product?.id) {
+  const relatedResponse = await fetch(
+    `${baseUrl}/api/wordpress/products/related?exclude=${product.id}&limit=5`,
+    { cache: "no-store" }
+  )
+  if (relatedResponse.ok) {
+    relatedProducts = await relatedResponse.json()
+  }
+}
     } else {
       const errorData = await response.json().catch(() => ({}))
       error = errorData.error || `HTTP ${response.status}`
