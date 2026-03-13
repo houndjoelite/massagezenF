@@ -6,6 +6,12 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { ProductDisplay } from "@/components/product-display"
 
+interface Category {
+  id: number
+  name: string
+  slug: string
+}
+
 interface Product {
   id: string
   title: string
@@ -22,7 +28,7 @@ interface Product {
   ratingCount: number
   externalUrl: string | null
   buttonText: string
-  categories: string[]
+  categories: Category[]
   tags: string[]
   seo: {
     title: string
@@ -104,15 +110,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
     if (response.ok) {
       product = await response.json()
 
-    if (product?.id) {
-  const relatedResponse = await fetch(
-    `${baseUrl}/api/wordpress/products/related?exclude=${product.id}&limit=5`,
-    { cache: "no-store" }
-  )
-  if (relatedResponse.ok) {
-    relatedProducts = await relatedResponse.json()
-  }
-}
+      if (product?.id) {
+        const categoryId = product.categories?.[0]?.id || ''
+        const relatedResponse = await fetch(
+          `${baseUrl}/api/wordpress/products/related?exclude=${product.id}&limit=5&category=${categoryId}`,
+          { cache: "no-store" }
+        )
+        if (relatedResponse.ok) {
+          relatedProducts = await relatedResponse.json()
+        }
+      }
     } else {
       const errorData = await response.json().catch(() => ({}))
       error = errorData.error || `HTTP ${response.status}`
@@ -151,6 +158,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <span>/</span>
           <Link href="/categories" className="hover:text-primary transition-colors">Catégories</Link>
           <span>/</span>
+          {product.categories?.[0] && (
+            <>
+              <Link
+                href={`/categories/${categorySlugMapping[product.categories[0].slug] || product.categories[0].slug}`}
+                className="hover:text-primary transition-colors"
+              >
+                {product.categories[0].name}
+              </Link>
+              <span>/</span>
+            </>
+          )}
           <span className="text-foreground font-medium">{product.title}</span>
         </nav>
 
