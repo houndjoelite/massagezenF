@@ -8,8 +8,8 @@ export async function GET(request: NextRequest) {
 
   try {
     const response = await fetchWooCommerce(
-      `/products?per_page=${limit}&exclude=${exclude}&status=publish&orderby=rand`
-    )
+  `/products?per_page=${limit}&exclude=${exclude}&status=publish`
+)
     const products = await response.json()
 
     const formatted = products.map((p: any) => ({
