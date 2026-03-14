@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { decodeHtml } from "@/lib/utils/decode"
 
-const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL 
+const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL
   ? `${process.env.NEXT_PUBLIC_WORDPRESS_URL}/wp-json/wp/v2`
   : "https://cmsmonappareildemagge.monappareildemassage.com/wp-json/wp/v2"
 
@@ -10,18 +11,14 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get("limit") || "10"
     const category = searchParams.get("category")
 
-    // Assuming you have a custom post type 'products' in WordPress
     let url = `${WORDPRESS_API_URL}/products?per_page=${limit}&_embed`
-
     if (category) {
       url += `&product_categories=${category}`
     }
 
     const response = await fetch(url, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store", // Force le fetch de données fraîches
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
     })
 
     if (!response.ok) {
@@ -30,15 +27,14 @@ export async function GET(request: NextRequest) {
 
     const products = await response.json()
 
-    // Transform WordPress products to match our Product interface
     const transformedProducts = products.map((product: any) => ({
       id: product.id.toString(),
-      name: product.title.rendered,
-      description: product.content.rendered,
+      name: decodeHtml(product.title.rendered),
+      description: decodeHtml(product.content.rendered),
       price: product.acf?.price || "Prix sur demande",
       originalPrice: product.acf?.original_price,
       image: product._embedded?.["wp:featuredmedia"]?.[0]?.source_url || "/massage-device.png",
-      category: product._embedded?.["wp:term"]?.[0]?.[0]?.name || "Appareils de massage",
+      category: decodeHtml(product._embedded?.["wp:term"]?.[0]?.[0]?.name || "Appareils de massage"),
       rating: product.acf?.rating || 4.5,
       reviews: product.acf?.reviews || 0,
       features: product.acf?.features ? product.acf.features.split("\n") : [],
