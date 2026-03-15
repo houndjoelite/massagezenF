@@ -292,17 +292,31 @@ export function WordPressContent({ content, className = "" }: WordPressContentPr
     })
 
     // Styliser les titres
-    const headings = contentElement.querySelectorAll('h1, h2, h3, h4, h5, h6')
-    headings.forEach((heading) => {
-      const level = parseInt(heading.tagName.charAt(1))
-      heading.classList.add('font-bold', 'text-gray-900', 'dark:text-white', 'mt-8', 'mb-4')
-      
-      if (level === 1) heading.classList.add('text-3xl', 'lg:text-4xl')
-      else if (level === 2) heading.classList.add('text-2xl', 'lg:text-3xl')
-      else if (level === 3) heading.classList.add('text-xl', 'lg:text-2xl')
-      else if (level === 4) heading.classList.add('text-lg', 'lg:text-xl')
-      else heading.classList.add('text-base', 'lg:text-lg')
-    })
+  // APRÈS
+const headings = contentElement.querySelectorAll('h1, h2, h3, h4, h5, h6')
+headings.forEach((heading) => {
+  const level = parseInt(heading.tagName.charAt(1))
+  heading.classList.add('font-bold', 'text-gray-900', 'dark:text-white', 'mt-8', 'mb-4')
+
+  if (level === 1) heading.classList.add('text-3xl', 'lg:text-4xl')
+  else if (level === 2) heading.classList.add('text-2xl', 'lg:text-3xl')
+  else if (level === 3) heading.classList.add('text-xl', 'lg:text-2xl')
+  else if (level === 4) heading.classList.add('text-lg', 'lg:text-xl')
+  else heading.classList.add('text-base', 'lg:text-lg')
+
+  // ✅ Ajouter un id sur chaque H2 pour la table des matières
+  if (level === 2) {
+    const rawText = heading.textContent?.trim() || ""
+    const id = rawText
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .substring(0, 60)
+    if (id) heading.setAttribute("id", id)
+  }
+})
 
     // Styliser les paragraphes
     const paragraphs = contentElement.querySelectorAll('p')
