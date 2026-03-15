@@ -5,7 +5,8 @@ import { decodeHtml } from "@/lib/utils/decode"
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const limit = searchParams.get("limit") || "10"
+    const limit = searchParams.get("limit") || "12"
+const page = searchParams.get("page") || "1"
     const category = searchParams.get("category")
 
     let endpoint = `/posts?per_page=${limit}&_embed&status=publish`
