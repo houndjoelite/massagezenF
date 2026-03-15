@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 const page = searchParams.get("page") || "1"
     const category = searchParams.get("category")
 
-    let endpoint = `/posts?per_page=${limit}&_embed&status=publish`
+    let endpoint = `/posts?per_page=${limit}&page=${page}&_embed&status=publish`
     if (category) {
       endpoint += `&categories=${category}`
     }
@@ -49,6 +49,12 @@ const page = searchParams.get("page") || "1"
     return NextResponse.json(transformedPosts)
   } catch (error) {
     console.error("Error fetching WordPress posts:", error)
-    return NextResponse.json([], { status: 200 })
-  }
-}
+const totalPages = parseInt(response.headers.get("X-WP-TotalPages") || "1")
+const totalPosts = parseInt(response.headers.get("X-WP-Total") || "0")
+
+return NextResponse.json({
+  posts: transformedPosts,
+  totalPages,
+  totalPosts,
+  currentPage: parseInt(page),
+})
