@@ -70,10 +70,11 @@ export function TableOfContents({ content }: { content: string }) {
         <List className="h-5 w-5 text-primary" />
         <h2 className="font-semibold text-base">Table des matières</h2>
       </div>
+
       <ol className="space-y-2 list-none">
         {headings.map((heading, index) => (
           <li key={index}>
-            
+            <a
               href={`#${heading.id}`}
               className={`text-sm hover:text-primary transition-colors flex items-center gap-2 ${
                 activeId === heading.id
