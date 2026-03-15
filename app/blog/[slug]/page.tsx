@@ -34,36 +34,23 @@ interface Article {
   }
 }
 
-// Configuration pour le rendu dynamique
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-// Générer les paramètres statiques pour les articles populaires
 export async function generateStaticParams() {
   try {
-    const baseUrl = process.env.NODE_ENV === 'production' 
+    const baseUrl = process.env.NODE_ENV === 'production'
       ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
       : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-    
-    const response = await fetch(
-      `${baseUrl}/api/wordpress/posts?limit=50`,
-      { 
-        cache: "no-store",
-        headers: {
-          'User-Agent': 'MassageZen/1.0',
-        }
-      }
-    )
 
-    if (!response.ok) {
-      console.error('Failed to fetch posts for static params:', response.status)
-      return []
-    }
+    const response = await fetch(`${baseUrl}/api/wordpress/posts?limit=50`, {
+      cache: "no-store",
+      headers: { 'User-Agent': 'MassageZen/1.0' }
+    })
 
+    if (!response.ok) return []
     const posts = await response.json()
-    return posts.map((post: Article) => ({
-      slug: post.slug,
-    }))
+    return posts.map((post: Article) => ({ slug: post.slug }))
   } catch (error) {
     console.error('Error generating static params:', error)
     return []
@@ -116,73 +103,29 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 }
 
-    if (!response.ok) {
-      console.error(`Metadata fetch failed for ${slug}: ${response.status}`)
-      return {
-        title: "Article non trouvé | MassageZen",
-        description: "Cet article n'existe pas ou a été supprimé.",
-      }
-    }
-
-    const article: Article = await response.json()
-
-    return {
-      title: `${article.seo.title} | MassageZen`,
-      description: article.seo.description,
-      openGraph: {
-        title: article.seo.title,
-        description: article.seo.description,
-        images: article.image ? [article.image] : [],
-        type: 'article',
-        publishedTime: article.publishedAt,
-        authors: [article.author],
-      },
-    }
-  } catch (error) {
-    console.error(`Metadata generation error:`, error)
-    return {
-      title: "Article non trouvé | MassageZen",
-      description: "Cet article n'existe pas ou a été supprimé.",
-    }
-  }
-}
-
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   let article: Article | null = null
   let error: string | null = null
 
   try {
-    // Utiliser l'URL absolue pour la production
-    const baseUrl = process.env.NODE_ENV === 'production' 
+    const baseUrl = process.env.NODE_ENV === 'production'
       ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
       : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-    
-    console.log(`Fetching article ${slug} from ${baseUrl}`)
-    
-    const response = await fetch(
-      `${baseUrl}/api/wordpress/posts/${slug}`,
-      {
-        cache: "no-store",
-        headers: {
-          'User-Agent': 'MassageZen/1.0',
-        }
-      }
-    )
 
-    console.log(`Response status for ${slug}: ${response.status}`)
+    const response = await fetch(`${baseUrl}/api/wordpress/posts/${slug}`, {
+      cache: "no-store",
+      headers: { 'User-Agent': 'MassageZen/1.0' }
+    })
 
     if (response.ok) {
       article = await response.json()
-      console.log(`Article ${slug} loaded successfully:`, article?.title)
     } else {
       const errorData = await response.json().catch(() => ({}))
       error = errorData.error || `HTTP ${response.status}: ${response.statusText}`
-      console.error(`Failed to fetch article ${slug}:`, error)
     }
   } catch (err) {
     error = err instanceof Error ? err.message : 'Unknown error'
-    console.error(`Error fetching article ${slug}:`, err)
   }
 
   if (!article) {
@@ -232,9 +175,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
           <div className="max-w-5xl mx-auto">
             <div className="mb-12">
-              <Button 
-                variant="ghost" 
-                asChild 
+              <Button
+                variant="ghost"
+                asChild
                 className="mb-8 group/back hover:bg-primary/5 transition-all duration-300"
               >
                 <Link href="/blog" className="flex items-center">
@@ -285,8 +228,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               )}
             </div>
 
-            <WordPressContent 
-              content={article.content} 
+            <WordPressContent
+              content={article.content}
               className="prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 dark:prose-strong:text-white"
             />
 
@@ -304,9 +247,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                     <span className="font-medium">{new Date(article.publishedAt).toLocaleDateString("fr-FR")}</span>
                   </div>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-gray-200 dark:border-gray-700 hover:bg-primary/5 hover:border-primary/20 transition-all duration-300 group/share"
                 >
                   <Share2 className="h-4 w-4 mr-2 group-hover/share:scale-110 transition-transform duration-300" />
