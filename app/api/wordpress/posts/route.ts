@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const limit = searchParams.get("limit") || "12"
-const page = searchParams.get("page") || "1"
+    const page = searchParams.get("page") || "1"
     const category = searchParams.get("category")
 
     let endpoint = `/posts?per_page=${limit}&page=${page}&_embed&status=publish`
@@ -24,6 +24,9 @@ const page = searchParams.get("page") || "1"
     }
 
     const posts = await response.json()
+
+    const totalPages = parseInt(response.headers.get("X-WP-TotalPages") || "1")
+    const totalPosts = parseInt(response.headers.get("X-WP-Total") || "0")
 
     const transformedPosts = posts.map((post: any) => ({
       id: post.id.toString(),
@@ -46,15 +49,18 @@ const page = searchParams.get("page") || "1"
       },
     }))
 
-    return NextResponse.json(transformedPosts)
+    return NextResponse.json({
+      posts: transformedPosts,
+      totalPages,
+      totalPosts,
+      currentPage: parseInt(page),
+    })
+
   } catch (error) {
     console.error("Error fetching WordPress posts:", error)
-const totalPages = parseInt(response.headers.get("X-WP-TotalPages") || "1")
-const totalPosts = parseInt(response.headers.get("X-WP-Total") || "0")
-
-return NextResponse.json({
-  posts: transformedPosts,
-  totalPages,
-  totalPosts,
-  currentPage: parseInt(page),
-})
+    return NextResponse.json(
+      { posts: [], totalPages: 1, totalPosts: 0, currentPage: 1 },
+      { status: 200 }
+    )
+  }
+}
