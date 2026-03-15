@@ -9,14 +9,13 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://massagezen.fr'),
+  metadataBase: new URL('https://monappareildemassage.com'),
   title: {
     default: "MassageZen - Appareils de Massage Premium | Guides & Comparatifs",
     template: "%s | MassageZen",
   },
   description:
-    "✅ Découvrez les meilleurs appareils de massage 2024 : pistolets de massage, fauteuils, coussinets chauffants. ⭐ Guides d'experts, comparatifs détaillés et avis vérifiés pour votre bien-être.",
-  generator: "v0.app",
+    "Découvrez les meilleurs appareils de massage 2026 : pistolets de massage, fauteuils, coussinets chauffants. Guides d'experts, comparatifs détaillés et avis vérifiés pour votre bien-être.",
   keywords: [
     "appareil massage",
     "pistolet massage",
@@ -49,11 +48,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://massagezen.fr",
+    url: "https://monappareildemassage.com",
     siteName: "MassageZen",
     title: "MassageZen - Appareils de Massage Premium | Guides & Comparatifs",
     description:
-      "Découvrez les meilleurs appareils de massage 2024. Guides d'experts, comparatifs détaillés et avis vérifiés pour votre bien-être.",
+      "Découvrez les meilleurs appareils de massage 2026. Guides d'experts, comparatifs détaillés et avis vérifiés pour votre bien-être.",
     images: [
       {
         url: "/og-image-massagezen.png",
@@ -66,7 +65,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "MassageZen - Appareils de Massage Premium",
-    description: "Guides d'experts et comparatifs des meilleurs appareils de massage 2024",
+    description: "Guides d'experts et comparatifs des meilleurs appareils de massage 2026",
     images: ["/og-image-massagezen.png"],
   },
 }
