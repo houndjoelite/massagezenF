@@ -1,51 +1,43 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { fetchWooCommerce } from "@/lib/woocommerce-api"
 import { decodeHtml } from "@/lib/utils/decode"
-
-const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL
-  ? `${process.env.NEXT_PUBLIC_WORDPRESS_URL}/wp-json/wp/v2`
-  : "https://cmsmonappareildemagge.monappareildemassage.com/wp-json/wp/v2"
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const limit = searchParams.get("limit") || "10"
+    const limit = searchParams.get("limit") || "100"
     const category = searchParams.get("category")
 
-    let url = `${WORDPRESS_API_URL}/products?per_page=${limit}&_embed`
+    let endpoint = `/products?per_page=${limit}&status=publish&orderby=date&order=desc`
     if (category) {
-      url += `&product_categories=${category}`
+      endpoint += `&category=${category}`
     }
 
-    const response = await fetch(url, {
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-    })
+    const response = await fetchWooCommerce(endpoint)
 
     if (!response.ok) {
-      throw new Error(`WordPress API error: ${response.status}`)
+      throw new Error(`WooCommerce API error: ${response.status}`)
     }
 
     const products = await response.json()
 
     const transformedProducts = products.map((product: any) => ({
       id: product.id.toString(),
-      name: decodeHtml(product.title.rendered),
-      description: decodeHtml(product.content.rendered),
-      price: product.acf?.price || "Prix sur demande",
-      originalPrice: product.acf?.original_price,
-      image: product._embedded?.["wp:featuredmedia"]?.[0]?.source_url || "/massage-device.png",
-      category: decodeHtml(product._embedded?.["wp:term"]?.[0]?.[0]?.name || "Appareils de massage"),
-      rating: product.acf?.rating || 4.5,
-      reviews: product.acf?.reviews || 0,
-      features: product.acf?.features ? product.acf.features.split("\n") : [],
-      amazonUrl: product.acf?.amazon_url || "#",
-      inStock: product.acf?.in_stock !== false,
-      badge: product.acf?.badge || null,
+      slug: product.slug,
+      name: decodeHtml(product.name),
+      description: decodeHtml(product.description),
+      price: product.price || "Prix sur demande",
+      originalPrice: product.regular_price || null,
+      image: product.images?.[0]?.src || "/massage-device.png",
+      category: decodeHtml(product.categories?.[0]?.name || "Appareils de massage"),
+      categorySlug: product.categories?.[0]?.slug || "",
+      inStock: product.stock_status === "instock",
+      publishedAt: product.date_created,
     }))
 
     return NextResponse.json(transformedProducts)
   } catch (error) {
-    console.error("Error fetching WordPress products:", error)
-    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
+    console.error("Error fetching WooCommerce products:", error)
+    return NextResponse.json([], { status: 200 })
   }
 }
