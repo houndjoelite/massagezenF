@@ -1,5 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getProductBySlug } from "@/lib/woocommerce-api"
+import { decodeHtml } from "@/lib/utils/decode"
+
+function stripHtml(html: string): string {
+  return (html || "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+}
 
 export async function GET(
   request: NextRequest,
@@ -17,9 +25,9 @@ export async function GET(
 
     const transformedProduct = {
       id: product.id.toString(),
-      title: product.name,
+      title: decodeHtml(product.name),
       slug: product.slug,
-      excerpt: product.short_description || "Aucun résumé disponible",
+      excerpt: stripHtml(product.short_description).substring(0, 155),
       content: product.description || "",
       image: product.images && product.images.length > 0 ? product.images[0].src : null,
       galleryImages: product.images ? product.images.map((img: any) => img.src) : [],
@@ -38,8 +46,8 @@ export async function GET(
       })) : [],
       tags: product.tags ? product.tags.map((tag: any) => tag.name) : [],
       seo: {
-        title: product.name,
-        description: product.short_description || "",
+        title: decodeHtml(product.name),
+        description: stripHtml(product.short_description || product.description).substring(0, 155),
         keywords: product.tags ? product.tags.map((tag: any) => tag.name) : []
       }
     }
