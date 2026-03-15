@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { ProductDisplay } from "@/components/product-display"
+import { ProductSchema, BreadcrumbSchema } from "@/components/schema-markup"
 
 const categorySlugMapping: Record<string, string> = {
   'pistolets-de-massage-musculaire': 'pistolets-massage',
@@ -162,9 +163,29 @@ export default async function ProductPage({ params }: ProductPageProps) {
     )
   }
 
-  return (
+ return (
     <div className="min-h-screen">
       <Header />
+      <ProductSchema product={{
+        title: product.title,
+        description: product.excerpt || product.seo.description,
+        image: product.image,
+        price: product.price,
+        currency: product.currency,
+        stockStatus: product.stockStatus,
+        averageRating: product.averageRating,
+        ratingCount: product.ratingCount,
+        slug: product.slug,
+      }} />
+      <BreadcrumbSchema items={[
+        { name: "Accueil", url: "https://monappareildemassage.com" },
+        { name: "Catégories", url: "https://monappareildemassage.com/categories" },
+        ...(product.categories?.[0] ? [{
+          name: product.categories[0].name,
+          url: `https://monappareildemassage.com/categories/${categorySlugMapping[product.categories[0].slug] || product.categories[0].slug}`
+        }] : []),
+        { name: product.title, url: `https://monappareildemassage.com/produits/${product.slug}` },
+      ]} />
 
       <main className="container mx-auto px-4 py-12">
 
