@@ -67,14 +67,13 @@ interface ProductPageProps {
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
-
 export async function generateMetadata({ params }: ProductPageProps) {
   const { slug } = await params
-  try {
-    const baseUrl = process.env.NODE_ENV === 'production'
-      ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
-      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  const baseUrl = process.env.NODE_ENV === 'production'
+    ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
+    : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
 
+  try {
     const response = await fetch(`${baseUrl}/api/wordpress/products/${slug}`, {
       cache: "no-store",
       headers: { 'User-Agent': 'MassageZen/1.0' }
@@ -86,9 +85,13 @@ export async function generateMetadata({ params }: ProductPageProps) {
         title: `${product.title} | MassageZen`,
         description: product.excerpt || product.seo.description,
         keywords: product.seo.keywords.join(", "),
+        alternates: {
+          canonical: `${baseUrl}/produits/${slug}`,
+        },
         openGraph: {
           title: product.title,
           description: product.excerpt || product.seo.description,
+          url: `${baseUrl}/produits/${slug}`,
           images: product.image ? [product.image] : [],
           type: 'website',
         },
