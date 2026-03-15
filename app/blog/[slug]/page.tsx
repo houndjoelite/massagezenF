@@ -1,3 +1,4 @@
+import { ArticleSchema, BreadcrumbSchema } from "@/components/schema-markup"
 import { Header } from "@/components/header"
 import Footer from "@/components/footer"
 import { Badge } from "@/components/ui/badge"
@@ -130,9 +131,22 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   if (!article) {
     return (
-      <div className="min-h-screen">
-        <Header />
-        <main className="container mx-auto px-4 py-20 text-center">
+    <div className="min-h-screen">
+      <Header />
+      <ArticleSchema article={{
+        title: article.title,
+        excerpt: article.excerpt,
+        image: article.image,
+        publishedAt: article.publishedAt,
+        author: article.author,
+        slug: article.slug,
+      }} />
+      <BreadcrumbSchema items={[
+        { name: "Accueil", url: "https://monappareildemassage.com" },
+        { name: "Blog", url: "https://monappareildemassage.com/blog" },
+        { name: article.title, url: `https://monappareildemassage.com/blog/${article.slug}` },
+      ]} />
+      <main>
           <h1 className="text-4xl font-bold mb-4">Article non trouvé</h1>
           <p className="text-muted-foreground mb-8">
             {error ? `Erreur: ${error}` : "Cet article n'existe pas ou a été supprimé."}
