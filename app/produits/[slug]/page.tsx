@@ -1,3 +1,4 @@
+import { ProductSchema, BreadcrumbSchema } from "@/components/schema-markup"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -5,7 +6,7 @@ import { ArrowLeft } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { ProductDisplay } from "@/components/product-display"
-import { ProductSchema, BreadcrumbSchema } from "@/components/schema-markup"
+
 
 const categorySlugMapping: Record<string, string> = {
   'pistolets-de-massage-musculaire': 'pistolets-massage',
