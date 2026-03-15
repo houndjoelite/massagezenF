@@ -73,21 +73,48 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params
-    
-    // Utiliser l'URL absolue pour la production
-    const baseUrl = process.env.NODE_ENV === 'production' 
+    const baseUrl = process.env.NODE_ENV === 'production'
       ? process.env.NEXT_PUBLIC_SITE_URL || 'https://monappareildemassage.com'
       : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-    
-    const response = await fetch(
-      `${baseUrl}/api/wordpress/posts/${slug}`,
-      { 
-        cache: "no-store",
-        headers: {
-          'User-Agent': 'MassageZen/1.0',
-        }
+
+    const response = await fetch(`${baseUrl}/api/wordpress/posts/${slug}`, {
+      cache: "no-store",
+      headers: { 'User-Agent': 'MassageZen/1.0' }
+    })
+
+    if (!response.ok) {
+      return {
+        title: "Article non trouvé | MassageZen",
+        description: "Cet article n'existe pas ou a été supprimé.",
       }
-    )
+    }
+
+    const article: Article = await response.json()
+
+    return {
+      title: `${article.seo.title} | MassageZen`,
+      description: article.seo.description,
+      alternates: {
+        canonical: `${baseUrl}/blog/${slug}`,
+      },
+      openGraph: {
+        title: article.seo.title,
+        description: article.seo.description,
+        url: `${baseUrl}/blog/${slug}`,
+        images: article.image ? [article.image] : [],
+        type: 'article',
+        publishedTime: article.publishedAt,
+        authors: [article.author],
+      },
+    }
+  } catch (error) {
+    console.error(`Metadata generation error:`, error)
+    return {
+      title: "Article non trouvé | MassageZen",
+      description: "Cet article n'existe pas ou a été supprimé.",
+    }
+  }
+}
 
     if (!response.ok) {
       console.error(`Metadata fetch failed for ${slug}: ${response.status}`)
