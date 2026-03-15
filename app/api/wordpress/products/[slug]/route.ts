@@ -2,11 +2,16 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getProductBySlug } from "@/lib/woocommerce-api"
 import { decodeHtml } from "@/lib/utils/decode"
 
-function stripHtml(html: string): string {
-  return (html || "")
+function stripHtml(html: string, maxLength: number = 150): string {
+  const text = (html || "")
     .replace(/<[^>]*>/g, "")
     .replace(/\s+/g, " ")
     .trim()
+
+  if (text.length <= maxLength) return text
+
+  const truncated = text.substring(0, maxLength)
+  return truncated.substring(0, truncated.lastIndexOf(" ")) + "..."
 }
 
 export async function GET(
@@ -27,7 +32,7 @@ export async function GET(
       id: product.id.toString(),
       title: decodeHtml(product.name),
       slug: product.slug,
-      excerpt: stripHtml(product.short_description).substring(0, 155),
+      excerpt: stripHtml(product.short_description, 150),
       content: product.description || "",
       image: product.images && product.images.length > 0 ? product.images[0].src : null,
       galleryImages: product.images ? product.images.map((img: any) => img.src) : [],
@@ -47,7 +52,7 @@ export async function GET(
       tags: product.tags ? product.tags.map((tag: any) => tag.name) : [],
       seo: {
         title: decodeHtml(product.name),
-        description: stripHtml(product.short_description || product.description).substring(0, 155),
+        description: stripHtml(product.short_description || product.description, 150),
         keywords: product.tags ? product.tags.map((tag: any) => tag.name) : []
       }
     }
