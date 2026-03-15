@@ -39,7 +39,7 @@ export function BlogPreview() {
           throw new Error("Failed to fetch articles")
         }
         const data = await response.json()
-        setArticles(data)
+        setArticles(data.posts || data)
       } catch (error) {
         console.error("Error loading articles:", error)
         setArticles([]) // Set empty array on error
