@@ -335,20 +335,7 @@ export default function AProposPage() {
             </div>
           </div>
 
-          {/* ── MENTIONS LÉGALES LINK ── */}
-          <div className="text-center text-sm text-muted-foreground space-x-4">
-            <a href="/mentions-legales" className="hover:text-primary underline underline-offset-2">
-              Mentions légales
-            </a>
-            <span>·</span>
-            <a href="/politique-confidentialite" className="hover:text-primary underline underline-offset-2">
-              Politique de confidentialité
-            </a>
-            <span>·</span>
-            <a href="/contact" className="hover:text-primary underline underline-offset-2">
-              Contact
-            </a>
-          </div>
+         >
 
         </div>
       </main>
