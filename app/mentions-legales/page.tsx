@@ -85,7 +85,7 @@ export default function MentionsLegalesPage() {
                           href="mailto:houndjojeanjacques82@gmail.com"
                           className="text-primary underline underline-offset-2 hover:opacity-80"
                         >
-                          houndjojeanjacques82@gmail.com
+                          contact@monappareildemassage.com
                         </a>
                       </p>
                     </div>
@@ -286,7 +286,7 @@ export default function MentionsLegalesPage() {
 
               {/* Date + liens */}
               <p className="text-center text-xs text-muted-foreground pt-2">
-                Dernière mise à jour : mars 2026
+                Dernière mise à jour : 16 mars 2026
               </p>
 
               <div className="text-center text-sm text-muted-foreground space-x-4 pb-8">
