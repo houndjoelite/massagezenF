@@ -1,8 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { ImageGallery } from "./image-gallery"
-import "../styles/wordpress-content.css"
+import { useEffect, useState, useRef } from "react"
 
 interface WordPressContentProps {
   content: string
@@ -11,541 +9,706 @@ interface WordPressContentProps {
 
 export function WordPressContent({ content, className = "" }: WordPressContentProps) {
   const [processedContent, setProcessedContent] = useState<string>("")
-  const [showLightbox, setShowLightbox] = useState(false)
-  const [currentGallery, setCurrentGallery] = useState<{ images: string[], captions: string[] } | null>(null)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [lightboxData, setLightboxData] = useState<{ images: string[]; captions: string[]; index: number } | null>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
 
+  /* ─────────────────────────────────────────────
+     1. Process HTML galleries
+  ───────────────────────────────────────────── */
   useEffect(() => {
-    // Traiter le contenu pour remplacer les galeries par nos composants
-    let processedHtml = content
-    
-    // Détecter les galeries WordPress et les groupes d'images
-    let galleryIndex = 0
-    const galleries: Array<{ images: string[], captions: string[] }> = []
-    
-    // Créer un DOM temporaire pour analyser le HTML
-    const tempDiv = document.createElement('div')
-    tempDiv.innerHTML = processedHtml
-    
-    // 1. Détecter les galeries WordPress natives (.gallery, .wp-block-gallery)
-    const wordpressGalleries = tempDiv.querySelectorAll('.gallery, .wp-block-gallery, [class*="gallery"]')
-    wordpressGalleries.forEach((gallery) => {
-      const images = Array.from(gallery.querySelectorAll('img'))
-      if (images.length >= 2) {
-        const galleryImages: string[] = []
-        const galleryCaptions: string[] = []
-        
-        images.forEach((img) => {
-          const imgElement = img as HTMLImageElement
-          galleryImages.push(imgElement.src)
-          // Chercher une légende dans le conteneur parent
-          const caption = img.closest('.gallery-item, .wp-block-image, figure')?.querySelector('figcaption, .wp-caption-text, .gallery-caption, .wp-element-caption')
-          galleryCaptions.push(caption?.textContent?.trim() || '')
+    let html = content
+    const tempDiv = document.createElement("div")
+    tempDiv.innerHTML = html
+
+    const galleries: Array<{ images: string[]; captions: string[] }> = []
+    let gIdx = 0
+
+    // WordPress native galleries
+    tempDiv.querySelectorAll(".gallery, .wp-block-gallery, [class*='gallery']").forEach((gal) => {
+      const imgs = Array.from(gal.querySelectorAll("img"))
+      if (imgs.length >= 2) {
+        const images: string[] = []
+        const captions: string[] = []
+        imgs.forEach((img) => {
+          images.push((img as HTMLImageElement).src)
+          const cap = img.closest(".gallery-item, .wp-block-image, figure")
+            ?.querySelector("figcaption, .wp-caption-text, .gallery-caption, .wp-element-caption")
+          captions.push(cap?.textContent?.trim() || "")
         })
-        
-        galleries.push({ images: galleryImages, captions: galleryCaptions })
-        
-        // Remplacer la galerie WordPress par un placeholder
-        const placeholder = document.createElement('div')
-        placeholder.setAttribute('data-gallery-index', galleryIndex.toString())
-        placeholder.className = 'gallery-placeholder'
-        gallery.parentNode?.replaceChild(placeholder, gallery)
-        
-        galleryIndex++
-      }
-    })
-    
-    // 2. Détecter les groupes d'images consécutives (pas dans des galeries WordPress)
-    const allImages = tempDiv.querySelectorAll('img:not(.gallery img, .wp-block-gallery img, [class*="gallery"] img)')
-    let currentGroup: { images: string[], captions: string[], elements: Element[] } = { images: [], captions: [], elements: [] }
-    
-    allImages.forEach((img, index) => {
-      // Vérifier si cette image fait partie d'un groupe
-      const nextImg = allImages[index + 1]
-      const prevImg = allImages[index - 1]
-      
-      // Si c'est la première image d'un groupe ou si elle suit une autre image
-      if (!prevImg || (img.previousElementSibling === prevImg) || (img.parentElement === prevImg.parentElement)) {
-        const imgElement = img as HTMLImageElement
-        currentGroup.images.push(imgElement.src)
-        currentGroup.elements.push(img)
-        
-        // Chercher une légende
-        const caption = img.parentElement?.querySelector('figcaption, .wp-caption-text, .gallery-caption, .wp-element-caption')
-        currentGroup.captions.push(caption?.textContent?.trim() || '')
-        
-        // Si c'est la dernière image du groupe (pas d'image suivante ou pas consécutive)
-        if (!nextImg || (img.nextElementSibling !== nextImg) || (img.parentElement !== nextImg.parentElement)) {
-          if (currentGroup.images.length >= 2) {
-            // C'est un groupe d'images, le remplacer par une galerie
-            galleries.push({ images: currentGroup.images, captions: currentGroup.captions })
-            
-            // Remplacer le premier élément du groupe par un placeholder
-            const firstElement = currentGroup.elements[0]
-            const placeholder = document.createElement('div')
-            placeholder.setAttribute('data-gallery-index', galleryIndex.toString())
-            placeholder.className = 'gallery-placeholder'
-            firstElement.parentNode?.replaceChild(placeholder, firstElement)
-            
-            // Supprimer les autres éléments du groupe
-            currentGroup.elements.slice(1).forEach(el => el.remove())
-            
-            galleryIndex++
-          }
-          currentGroup = { images: [], captions: [], elements: [] }
-        }
-      }
-    })
-    
-    // Mettre à jour le HTML traité
-    processedHtml = tempDiv.innerHTML
-    
-    setProcessedContent(processedHtml)
-    
-    // Stocker les galeries pour le rendu
-    ;(window as any).__wordpress_galleries = galleries
-
-    // Attendre que le DOM soit mis à jour, puis remplacer les placeholders
-    setTimeout(() => {
-      const contentElement = document.querySelector('.wordpress-content')
-      if (!contentElement) return
-
-      // Récupérer les galeries depuis le window
-      const storedGalleries = (window as any).__wordpress_galleries as Array<{ images: string[], captions: string[] }>
-      if (!storedGalleries) return
-
-      // Remplacer les placeholders par les composants de galerie
-      const placeholders = contentElement.querySelectorAll('.gallery-placeholder')
-      placeholders.forEach((placeholder) => {
-        const galleryIndex = parseInt(placeholder.getAttribute('data-gallery-index') || '0')
-        const gallery = storedGalleries[galleryIndex]
-        
-        if (gallery && gallery.images && gallery.captions) {
-          const galleryContainer = document.createElement('div')
-          galleryContainer.className = 'wordpress-gallery-container'
-          galleryContainer.innerHTML = `
-            <div class="simple-gallery-grid">
-              ${gallery.images.map((image: string, index: number) => `
-                <div class="gallery-item" onclick="galleryOpenLightbox(${galleryIndex}, ${index})" role="button" tabindex="0" aria-label="Voir l'image ${index + 1} de la galerie">
-                  <img 
-                    src="${image}" 
-                    alt="${gallery.captions[index] || `Image ${index + 1}`}" 
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  ${gallery.captions[index] ? `
-                    <div class="gallery-caption">
-                      ${gallery.captions[index]}
-                    </div>
-                  ` : ''}
-                </div>
-              `).join('')}
-            </div>
-          `
-          placeholder.replaceWith(galleryContainer)
-        }
-      })
-
-      // Supprimer les classes WordPress par défaut qui peuvent causer des conflits
-      // MAIS préserver les icônes de shop et leurs liens
-      const elementsToClean = contentElement.querySelectorAll('*')
-      elementsToClean.forEach((element) => {
-        // Ne pas nettoyer les éléments de shop
-        if (element.classList.contains('shop-icon') || 
-            element.classList.contains('affiliate-link') ||
-            element.classList.contains('product-link') ||
-            element.tagName === 'A' && element.getAttribute('href')?.includes('amazon') ||
-            element.tagName === 'A' && element.getAttribute('href')?.includes('shop') ||
-            element.tagName === 'A' && element.getAttribute('href')?.includes('buy')) {
-          return // Préserver ces éléments
-        }
-        
-        // Supprimer les classes WordPress communes
-        const classesToRemove = [
-          'wp-block-image',
-          'wp-block-paragraph',
-          'wp-block-heading',
-          'wp-block-list',
-          'wp-block-quote',
-          'wp-block-code',
-          'wp-block-table',
-          'wp-block-group',
-          'wp-block-columns',
-          'wp-block-column',
-          'alignleft',
-          'alignright',
-          'aligncenter',
-          'alignwide',
-          'alignfull',
-          'size-full',
-          'size-large',
-          'size-medium',
-          'size-thumbnail',
-          'wp-caption',
-          'wp-caption-text',
-          'gallery',
-          'gallery-item',
-          'gallery-icon'
-        ]
-        
-        classesToRemove.forEach(cls => {
-          element.classList.remove(cls)
-        })
-      })
-
-    // Styliser les images - amélioration pour l'expérience utilisateur
-    const images = contentElement.querySelectorAll('img')
-    images.forEach((img) => {
-      // Classes de base
-      img.classList.add('rounded-lg', 'shadow-md', 'my-6', 'max-w-full', 'h-auto')
-      
-      // Styles responsifs améliorés
-      img.style.maxWidth = '100%'
-      img.style.width = '100%'
-      img.style.height = 'auto'
-      img.style.display = 'block'
-      img.style.marginLeft = 'auto'
-      img.style.marginRight = 'auto'
-      img.style.objectFit = 'contain'
-      
-      // Détecter si l'image est dans une galerie ou seule
-      const isInGallery = img.closest('.gallery, .wp-block-gallery, .wordpress-gallery-container, .simple-gallery-grid')
-      
-      if (!isInGallery) {
-        // Image unique - optimiser l'affichage
-        img.style.maxWidth = 'min(800px, 100%)'
-        img.style.width = '100%'
-        img.style.height = 'auto'
-        img.style.maxHeight = '70vh'
-        img.style.objectFit = 'contain'
-        img.style.cursor = 'pointer'
-        
-        // Ajouter un effet de zoom au survol pour les images uniques
-        img.addEventListener('mouseenter', () => {
-          img.style.transform = 'scale(1.02)'
-          img.style.transition = 'transform 0.3s ease'
-        })
-        
-        img.addEventListener('mouseleave', () => {
-          img.style.transform = 'scale(1)'
-        })
-        
-        // Permettre le clic pour agrandir l'image
-        img.addEventListener('click', () => {
-          const lightbox = document.createElement('div')
-          lightbox.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            cursor: pointer;
-          `
-          
-          const enlargedImg = img.cloneNode(true) as HTMLImageElement
-          enlargedImg.style.cssText = `
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-          `
-          
-          lightbox.appendChild(enlargedImg)
-          document.body.appendChild(lightbox)
-          
-          lightbox.addEventListener('click', () => {
-            document.body.removeChild(lightbox)
-          })
-        })
+        galleries.push({ images, captions })
+        const ph = document.createElement("div")
+        ph.dataset.galleryIndex = String(gIdx++)
+        ph.className = "mz-gallery-placeholder"
+        gal.parentNode?.replaceChild(ph, gal)
       }
     })
 
-    // Masquer les galeries WordPress originales (elles seront remplacées par notre composant)
-    const galleries = contentElement.querySelectorAll('.gallery, .wp-block-gallery')
-    galleries.forEach((gallery) => {
-      (gallery as HTMLElement).style.display = 'none'
-    })
-
-    // Gérer les images avec légendes WordPress
-    const figureElements = contentElement.querySelectorAll('figure')
-    figureElements.forEach((figure) => {
-      figure.classList.add('my-6', 'text-center')
-      
-      const img = figure.querySelector('img')
-      if (img) {
-        img.classList.add('rounded-lg', 'shadow-md', 'max-w-full', 'h-auto', 'mx-auto')
-        img.style.maxWidth = '600px'
-        img.style.width = '100%'
-        img.style.height = 'auto'
-      }
-      
-      const figcaption = figure.querySelector('figcaption')
-      if (figcaption) {
-        figcaption.classList.add('text-sm', 'text-gray-600', 'dark:text-gray-400', 'mt-2', 'italic')
-      }
-    })
-
-    // Styliser les titres
-  // APRÈS
-const headings = contentElement.querySelectorAll('h1, h2, h3, h4, h5, h6')
-headings.forEach((heading) => {
-  const level = parseInt(heading.tagName.charAt(1))
-  heading.classList.add('font-bold', 'text-gray-900', 'dark:text-white', 'mt-8', 'mb-4')
-
-  if (level === 1) heading.classList.add('text-3xl', 'lg:text-4xl')
-  else if (level === 2) heading.classList.add('text-2xl', 'lg:text-3xl')
-  else if (level === 3) heading.classList.add('text-xl', 'lg:text-2xl')
-  else if (level === 4) heading.classList.add('text-lg', 'lg:text-xl')
-  else heading.classList.add('text-base', 'lg:text-lg')
-
-  // ✅ Ajouter un id sur chaque H2 pour la table des matières
-  if (level === 2) {
-    const rawText = heading.textContent?.trim() || ""
-    const id = rawText
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .substring(0, 60)
-    if (id) heading.setAttribute("id", id)
-  }
-})
-
-    // Styliser les paragraphes
-    const paragraphs = contentElement.querySelectorAll('p')
-    paragraphs.forEach((p) => {
-      p.classList.add('text-gray-700', 'dark:text-gray-300', 'leading-relaxed', 'mb-4')
-    })
-
-    // Styliser les listes
-    const lists = contentElement.querySelectorAll('ul, ol')
-    lists.forEach((list) => {
-      list.classList.add('my-6', 'space-y-2')
-      const items = list.querySelectorAll('li')
-      items.forEach((item) => {
-        item.classList.add('text-gray-700', 'dark:text-gray-300', 'leading-relaxed')
-      })
-    })
-
-    // Styliser les citations
-    const blockquotes = contentElement.querySelectorAll('blockquote')
-    blockquotes.forEach((quote) => {
-      quote.classList.add('border-l-4', 'border-primary', 'bg-gray-50', 'dark:bg-gray-800/50', 'px-6', 'py-4', 'rounded-r-lg', 'italic', 'my-6')
-    })
-
-    // Styliser les liens et transformer les liens d'affiliation en boutons
-    const links = contentElement.querySelectorAll('a')
-    links.forEach((link) => {
-      const href = link.getAttribute('href') || ''
-      const text = link.textContent?.toLowerCase() || ''
-      
-      // Détecter les liens d'affiliation
-      const isAffiliateLink = href.includes('amazon') || 
-                             href.includes('shop') || 
-                             href.includes('buy') ||
-                             text.includes('voir sur amazon') ||
-                             text.includes('acheter') ||
-                             text.includes('commander') ||
-                             text.includes('disponible sur') ||
-                             text.includes('voir le produit') ||
-                             text.includes('voir sur') ||
-                             text.includes('en savoir plus') ||
-                             text.includes('découvrir')
-      
-      if (isAffiliateLink) {
-        // Transformer en bouton d'affiliation
-        link.classList.add('affiliate-button', 'inline-flex', 'items-center', 'gap-2', 'px-6', 'py-3', 'bg-gradient-to-r', 'from-orange-500', 'to-red-600', 'text-white', 'font-semibold', 'rounded-lg', 'shadow-lg', 'hover:shadow-xl', 'transition-all', 'duration-300', 'hover:scale-105', 'my-4', 'no-underline')
-        
-        // Ajouter une icône si c'est Amazon
-        if (href.includes('amazon') || text.includes('amazon')) {
-          link.innerHTML = `
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-            </svg>
-            ${link.textContent}
-          `
-        } else {
-          // Icône générique pour les autres liens d'affiliation
-          link.innerHTML = `
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-            </svg>
-            ${link.textContent}
-          `
-        }
-      } else {
-        // Lien normal
-        link.classList.add('text-primary', 'hover:underline', 'font-medium')
-      }
-    })
-
-    // Styliser les tableaux
-    const tables = contentElement.querySelectorAll('table')
-    tables.forEach((table) => {
-      table.classList.add('w-full', 'border-collapse', 'border', 'border-gray-300', 'dark:border-gray-600', 'my-6', 'rounded-lg', 'overflow-hidden')
-      const cells = table.querySelectorAll('td, th')
-      cells.forEach((cell) => {
-        cell.classList.add('border', 'border-gray-300', 'dark:border-gray-600', 'px-4', 'py-2', 'text-left')
-      })
-      const headers = table.querySelectorAll('th')
-      headers.forEach((header) => {
-        header.classList.add('bg-gray-100', 'dark:bg-gray-700', 'font-semibold')
-      })
-    })
-
-    // Styliser le code
-    const codeElements = contentElement.querySelectorAll('code, pre')
-    codeElements.forEach((code) => {
-      if (code.tagName === 'PRE') {
-        code.classList.add('bg-gray-100', 'dark:bg-gray-800', 'p-4', 'rounded-lg', 'overflow-x-auto', 'my-6')
-      } else {
-        code.classList.add('bg-gray-100', 'dark:bg-gray-800', 'px-2', 'py-1', 'rounded', 'text-sm', 'font-mono')
-      }
-    })
-
-    // Supprimer les éléments vides ou inutiles
-    const emptyElements = contentElement.querySelectorAll('p:empty, div:empty, span:empty')
-    emptyElements.forEach((element) => {
-      if (!element.innerHTML.trim()) {
-        element.remove()
-      }
-    })
-
-    }, 100)
+    ;(window as any).__mz_galleries = galleries
+    setProcessedContent(tempDiv.innerHTML)
   }, [content])
 
-  // Ajouter les fonctions globales pour les galeries
+  /* ─────────────────────────────────────────────
+     2. Apply rich styling after mount
+  ───────────────────────────────────────────── */
   useEffect(() => {
-    // Fonction pour ouvrir la lightbox depuis une galerie e-commerce
-    (window as any).galleryOpenLightbox = (galleryIndex: number, imageIndex: number) => {
-      const galleries = (window as any).__wordpress_galleries
-      if (galleries && galleries[galleryIndex]) {
-        setCurrentGallery(galleries[galleryIndex])
-        setCurrentImageIndex(imageIndex)
-        setShowLightbox(true)
-      }
+    if (!processedContent || !contentRef.current) return
+    const el = contentRef.current
+
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      applyStyles(el, setLightboxData)
+      renderGalleries(el)
+    }, 60)
+
+    return () => clearTimeout(timer)
+  }, [processedContent])
+
+  /* ─────────────────────────────────────────────
+     3. Keyboard for lightbox
+  ───────────────────────────────────────────── */
+  useEffect(() => {
+    if (!lightboxData) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxData(null)
+      if (e.key === "ArrowLeft") setLightboxData((p) => p && p.index > 0 ? { ...p, index: p.index - 1 } : p)
+      if (e.key === "ArrowRight") setLightboxData((p) => p && p.index < p.images.length - 1 ? { ...p, index: p.index + 1 } : p)
     }
-
-    // Fonction pour naviguer vers l'image précédente dans la lightbox
-    (window as any).galleryPrevious = () => {
-      if (currentGallery && currentImageIndex > 0) {
-        setCurrentImageIndex(currentImageIndex - 1)
-      } else if (currentGallery) {
-        setCurrentImageIndex(currentGallery.images.length - 1)
-      }
-    }
-
-    // Fonction pour naviguer vers l'image suivante dans la lightbox
-    (window as any).galleryNext = () => {
-      if (currentGallery && currentImageIndex < currentGallery.images.length - 1) {
-        setCurrentImageIndex(currentImageIndex + 1)
-      } else if (currentGallery) {
-        setCurrentImageIndex(0)
-      }
-    }
-
-    // Pas de fonctions de carrousel - galerie simple
-  }, [currentGallery, currentImageIndex])
-
-  const closeLightbox = () => {
-    setShowLightbox(false)
-  }
-
-  const goToPrevious = () => {
-    if (currentGallery && currentImageIndex > 0) {
-      setCurrentImageIndex(currentImageIndex - 1)
-    }
-  }
-
-  const goToNext = () => {
-    if (currentGallery && currentImageIndex < currentGallery.images.length - 1) {
-      setCurrentImageIndex(currentImageIndex + 1)
-    }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') closeLightbox()
-    if (e.key === 'ArrowLeft') goToPrevious()
-    if (e.key === 'ArrowRight') goToNext()
-  }
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [lightboxData])
 
   return (
-    <div className={`wordpress-content-wrapper ${className}`}>
-      <div 
-        className="wordpress-content prose prose-lg max-w-none"
+    <div className={`mz-article-wrapper ${className}`}>
+      <style>{STYLES}</style>
+
+      <div
+        ref={contentRef}
+        className="mz-content"
         dangerouslySetInnerHTML={{ __html: processedContent || content }}
       />
-      
-      {/* Lightbox */}
-      {showLightbox && currentGallery && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
-          onClick={closeLightbox}
-          onKeyDown={handleKeyDown}
-          tabIndex={0}
-        >
-          <div className="relative max-w-6xl max-h-full">
-            <button
-              onClick={closeLightbox}
-              className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
-            >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                goToPrevious()
-              }}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10"
-            >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                goToNext()
-              }}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10"
-            >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
 
-            <img
-              src={currentGallery.images[currentImageIndex]}
-              alt={currentGallery.captions[currentImageIndex] || `Image ${currentImageIndex + 1}`}
-              className="max-w-full max-h-full object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
-            
-            {currentGallery.captions[currentImageIndex] && (
-              <div className="absolute bottom-4 left-4 right-4 text-white text-center">
-                <p className="bg-black bg-opacity-75 rounded-lg p-3">
-                  {currentGallery.captions[currentImageIndex]}
-                </p>
-              </div>
-            )}
-            
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white text-sm">
-              {currentImageIndex + 1} / {currentGallery.images.length}
-            </div>
-          </div>
+      {/* Lightbox */}
+      {lightboxData && (
+        <div
+          className="mz-lightbox"
+          onClick={() => setLightboxData(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <button className="mz-lb-close" onClick={() => setLightboxData(null)} aria-label="Fermer">✕</button>
+          <span className="mz-lb-counter">{lightboxData.index + 1} / {lightboxData.images.length}</span>
+
+          {lightboxData.index > 0 && (
+            <button className="mz-lb-nav mz-lb-prev" onClick={(e) => { e.stopPropagation(); setLightboxData((p) => p ? { ...p, index: p.index - 1 } : p) }} aria-label="Précédent">‹</button>
+          )}
+
+          <img
+            src={lightboxData.images[lightboxData.index]}
+            alt={lightboxData.captions[lightboxData.index] || ""}
+            className="mz-lb-img"
+            onClick={(e) => e.stopPropagation()}
+          />
+
+          {lightboxData.index < lightboxData.images.length - 1 && (
+            <button className="mz-lb-nav mz-lb-next" onClick={(e) => { e.stopPropagation(); setLightboxData((p) => p ? { ...p, index: p.index + 1 } : p) }} aria-label="Suivant">›</button>
+          )}
+
+          {lightboxData.captions[lightboxData.index] && (
+            <p className="mz-lb-caption">{lightboxData.captions[lightboxData.index]}</p>
+          )}
         </div>
       )}
     </div>
   )
 }
+
+/* ═══════════════════════════════════════════════════
+   STYLE ENGINE — applique le design éditorial
+═══════════════════════════════════════════════════ */
+function applyStyles(
+  el: HTMLElement,
+  openLightbox: (data: { images: string[]; captions: string[]; index: number }) => void
+) {
+  /* --- HEADINGS --- */
+  el.querySelectorAll<HTMLElement>("h1,h2,h3,h4,h5,h6").forEach((h) => {
+    const lvl = parseInt(h.tagName[1])
+    h.classList.add("mz-heading", `mz-h${lvl}`)
+
+    // Anchor id for TOC
+    if (lvl === 2) {
+      const id = (h.textContent || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .substring(0, 60)
+      if (id) h.id = id
+    }
+  })
+
+  /* --- PARAGRAPHS --- */
+  el.querySelectorAll<HTMLElement>("p").forEach((p) => {
+    if (!p.closest(".mz-callout, .mz-stat-box, .mz-modele-card, .mz-profil-card")) {
+      p.classList.add("mz-para")
+    }
+  })
+
+  /* --- LISTS --- */
+  el.querySelectorAll<HTMLElement>("ul,ol").forEach((list) => {
+    if (!list.closest(".mz-callout, .mz-pros, .mz-cons, .mz-sommaire")) {
+      list.classList.add("mz-list")
+    }
+    list.querySelectorAll<HTMLElement>("li").forEach((li) => li.classList.add("mz-li"))
+  })
+
+  /* --- BLOCKQUOTES --- */
+  el.querySelectorAll<HTMLElement>("blockquote").forEach((q) => q.classList.add("mz-blockquote"))
+
+  /* --- TABLES --- */
+  el.querySelectorAll<HTMLElement>("table").forEach((t) => {
+    // Wrap for horizontal scroll
+    if (!t.parentElement?.classList.contains("mz-table-wrap")) {
+      const wrap = document.createElement("div")
+      wrap.className = "mz-table-wrap"
+      t.parentNode?.insertBefore(wrap, t)
+      wrap.appendChild(t)
+    }
+    t.classList.add("mz-table")
+    t.querySelectorAll<HTMLElement>("thead").forEach((th) => th.classList.add("mz-thead"))
+    t.querySelectorAll<HTMLElement>("th").forEach((th) => th.classList.add("mz-th"))
+    t.querySelectorAll<HTMLElement>("td").forEach((td) => td.classList.add("mz-td"))
+    t.querySelectorAll<HTMLElement>("tr").forEach((tr, i) => {
+      if (i % 2 === 0) tr.classList.add("mz-tr-even")
+    })
+    // Visual badges for ✓ / ✗
+    t.querySelectorAll<HTMLElement>("td").forEach((td) => {
+      const txt = td.textContent?.trim() || ""
+      if (txt.startsWith("✓") || txt.toLowerCase() === "oui") td.classList.add("mz-cell-yes")
+      else if (txt.startsWith("✗") || txt.toLowerCase() === "non") td.classList.add("mz-cell-no")
+      else if (txt.startsWith("⚡")) td.classList.add("mz-cell-partial")
+    })
+  })
+
+  /* --- FIGURES & IMAGES --- */
+  el.querySelectorAll<HTMLElement>("figure").forEach((fig) => {
+    fig.classList.add("mz-figure")
+    fig.querySelector("figcaption")?.classList.add("mz-figcaption")
+  })
+
+  el.querySelectorAll<HTMLImageElement>("img:not(.mz-lb-img)").forEach((img) => {
+    if (img.closest(".mz-gallery-grid, .mz-lb-img")) return
+    img.classList.add("mz-img")
+    img.loading = "lazy"
+    img.decoding = "async"
+    // Lightbox on click
+    img.style.cursor = "zoom-in"
+    img.addEventListener("click", () => {
+      openLightbox({ images: [img.src], captions: [img.alt || ""], index: 0 })
+    })
+  })
+
+  /* --- AFFILIATE LINKS → styled buttons --- */
+  el.querySelectorAll<HTMLAnchorElement>("a").forEach((a) => {
+    const href = a.getAttribute("href") || ""
+    const txt = a.textContent?.toLowerCase() || ""
+    const isAffiliate =
+      href.includes("amazon") || href.includes("amzn") || href.includes("awin") ||
+      txt.includes("voir sur amazon") || txt.includes("acheter") ||
+      txt.includes("commander") || txt.includes("voir le produit") ||
+      txt.includes("voir sur") || txt.includes("découvrir") || txt.includes("disponible")
+
+    if (isAffiliate) {
+      a.classList.add("mz-btn-affiliate")
+      a.setAttribute("target", "_blank")
+      a.setAttribute("rel", "nofollow sponsored noopener")
+      // Amazon badge
+      if (href.includes("amazon") || href.includes("amzn") || txt.includes("amazon")) {
+        a.classList.add("mz-btn-amazon")
+        if (!a.querySelector(".mz-amazon-icon")) {
+          a.innerHTML = `<span class="mz-amazon-icon">🛒</span> ${a.textContent}`
+        }
+      }
+    } else if (!a.closest("nav, .mz-sommaire, header, footer")) {
+      a.classList.add("mz-link")
+    }
+  })
+
+  /* --- CODE --- */
+  el.querySelectorAll<HTMLElement>("pre").forEach((pre) => pre.classList.add("mz-pre"))
+  el.querySelectorAll<HTMLElement>("code").forEach((code) => {
+    if (!code.closest("pre")) code.classList.add("mz-code")
+  })
+
+  /* --- STRONG highlights --- */
+  el.querySelectorAll<HTMLElement>("strong, b").forEach((s) => s.classList.add("mz-strong"))
+
+  /* --- Remove empty nodes --- */
+  el.querySelectorAll<HTMLElement>("p:empty, div:empty, span:empty").forEach((e) => {
+    if (!e.innerHTML.trim()) e.remove()
+  })
+}
+
+/* ═══════════════════════════════════════════════════
+   GALLERY RENDERER
+═══════════════════════════════════════════════════ */
+function renderGalleries(el: HTMLElement) {
+  const stored = (window as any).__mz_galleries as Array<{ images: string[]; captions: string[] }> | undefined
+  if (!stored) return
+
+  el.querySelectorAll<HTMLElement>(".mz-gallery-placeholder").forEach((ph) => {
+    const idx = parseInt(ph.dataset.galleryIndex || "0")
+    const gal = stored[idx]
+    if (!gal) return
+
+    const wrap = document.createElement("div")
+    wrap.className = "mz-gallery-grid"
+    wrap.innerHTML = gal.images
+      .map(
+        (src, i) => `
+        <div class="mz-gallery-item" role="button" tabindex="0"
+             onclick="window.__mz_open_lb(${idx},${i})"
+             onkeydown="if(event.key==='Enter')window.__mz_open_lb(${idx},${i})"
+             aria-label="Agrandir l'image ${i + 1}">
+          <img src="${src}" alt="${gal.captions[i] || `Image ${i + 1}`}" loading="lazy" decoding="async" />
+          ${gal.captions[i] ? `<div class="mz-gallery-caption">${gal.captions[i]}</div>` : ""}
+        </div>`
+      )
+      .join("")
+    ph.replaceWith(wrap)
+  })
+}
+
+/* ═══════════════════════════════════════════════════
+   SCOPED CSS — design éditorial MassageZen
+═══════════════════════════════════════════════════ */
+const STYLES = `
+/* ── TOKENS ─────────────────────────────────────── */
+.mz-article-wrapper {
+  --mz-green:       #2d6a4f;
+  --mz-green-light: #40916c;
+  --mz-green-pale:  #e8f5e9;
+  --mz-beige:       #f8f4ef;
+  --mz-gold:        #d4a853;
+  --mz-text:        #1a1a1a;
+  --mz-muted:       #6b7280;
+  --mz-border:      #e5e7eb;
+  --mz-red:         #b91c1c;
+  --mz-warn-bg:     #fff8e1;
+  --mz-warn-border: #ffe082;
+  --mz-info-bg:     #e3f2fd;
+  --mz-info-border: #90caf9;
+  --mz-radius:      10px;
+  --mz-font-body:   Georgia, 'Times New Roman', serif;
+  --mz-font-ui:     'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── WRAPPER ─────────────────────────────────────── */
+.mz-content {
+  font-family: var(--mz-font-body);
+  font-size: 17px;
+  line-height: 1.85;
+  color: var(--mz-text);
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* ── HEADINGS ─────────────────────────────────────── */
+.mz-content .mz-heading { font-family: var(--mz-font-ui); line-height: 1.25; margin-top: 3rem; margin-bottom: 1rem; }
+.mz-content .mz-h1 { font-size: clamp(26px,4vw,40px); color: var(--mz-green); }
+.mz-content .mz-h2 {
+  font-size: clamp(20px,3vw,28px);
+  color: var(--mz-green);
+  border-bottom: 2px solid var(--mz-beige);
+  padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mz-content .mz-h2::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 28px;
+  background: var(--mz-gold);
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.mz-content .mz-h3 { font-size: clamp(17px,2.5vw,22px); color: var(--mz-text); margin-top: 2.2rem; }
+.mz-content .mz-h4 { font-size: 17px; color: var(--mz-green-light); font-weight: 700; margin-top: 1.6rem; }
+.mz-content .mz-h5,.mz-content .mz-h6 { font-size: 15px; color: var(--mz-muted); font-weight: 700; margin-top: 1.2rem; }
+
+/* ── PARAGRAPHS ─────────────────────────────────── */
+.mz-content .mz-para {
+  margin-bottom: 1.2rem;
+  color: #374151;
+}
+
+/* ── STRONG ─────────────────────────────────────── */
+.mz-content .mz-strong {
+  color: var(--mz-text);
+  font-weight: 700;
+}
+
+/* ── LISTS ─────────────────────────────────────── */
+.mz-content .mz-list {
+  padding-left: 0;
+  margin: 1.4rem 0;
+  list-style: none;
+}
+.mz-content ul.mz-list .mz-li {
+  padding-left: 1.6rem;
+  position: relative;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+.mz-content ul.mz-list .mz-li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 11px;
+  width: 8px;
+  height: 8px;
+  background: var(--mz-green);
+  border-radius: 50%;
+}
+.mz-content ol.mz-list { counter-reset: mz-ol; }
+.mz-content ol.mz-list .mz-li {
+  padding-left: 2rem;
+  position: relative;
+  margin-bottom: 0.5rem;
+  color: #374151;
+  counter-increment: mz-ol;
+}
+.mz-content ol.mz-list .mz-li::before {
+  content: counter(mz-ol);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 22px;
+  height: 22px;
+  background: var(--mz-green);
+  color: #fff;
+  font-family: var(--mz-font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── BLOCKQUOTE ─────────────────────────────────── */
+.mz-content .mz-blockquote {
+  border-left: 4px solid var(--mz-green);
+  background: var(--mz-beige);
+  padding: 16px 24px;
+  border-radius: 0 var(--mz-radius) var(--mz-radius) 0;
+  font-style: italic;
+  color: #374151;
+  margin: 1.8rem 0;
+}
+
+/* ── TABLE ─────────────────────────────────────── */
+.mz-table-wrap {
+  overflow-x: auto;
+  margin: 1.8rem 0;
+  border-radius: var(--mz-radius);
+  border: 1px solid var(--mz-border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.mz-content .mz-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mz-font-ui);
+  font-size: 14px;
+}
+.mz-content .mz-thead { background: var(--mz-green); }
+.mz-content .mz-th {
+  color: #fff;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.mz-content .mz-td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--mz-border);
+  vertical-align: top;
+}
+.mz-content .mz-tr-even .mz-td { background: var(--mz-beige); }
+.mz-content .mz-cell-yes  { color: var(--mz-green); font-weight: 700; }
+.mz-content .mz-cell-no   { color: var(--mz-red);   font-weight: 700; }
+.mz-content .mz-cell-partial { color: #d97706; font-weight: 700; }
+
+/* ── IMAGES ─────────────────────────────────────── */
+.mz-content .mz-figure { margin: 2rem 0; text-align: center; }
+.mz-content .mz-figcaption {
+  font-family: var(--mz-font-ui);
+  font-size: 13px;
+  color: var(--mz-muted);
+  margin-top: 8px;
+  font-style: italic;
+}
+.mz-content .mz-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--mz-radius);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  display: block;
+  margin: 1.8rem auto;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.mz-content .mz-img:hover {
+  transform: scale(1.015);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.15);
+}
+
+/* ── GALLERY GRID ───────────────────────────────── */
+.mz-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 1.8rem 0;
+}
+.mz-gallery-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: zoom-in;
+  aspect-ratio: 1;
+  background: var(--mz-beige);
+}
+.mz-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.mz-gallery-item:hover img { transform: scale(1.06); }
+.mz-gallery-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-family: var(--mz-font-ui);
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+/* ── LINKS ─────────────────────────────────────── */
+.mz-content .mz-link {
+  color: var(--mz-green-light);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+  font-weight: 500;
+}
+.mz-content .mz-link:hover { border-color: var(--mz-green-light); }
+
+/* ── AFFILIATE BUTTONS ──────────────────────────── */
+.mz-content .mz-btn-affiliate {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: var(--mz-font-ui);
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none !important;
+  border-bottom: none !important;
+  margin: 1rem 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: linear-gradient(135deg, #f97316, #dc2626);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(220,38,38,0.35);
+}
+.mz-content .mz-btn-affiliate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(220,38,38,0.4);
+}
+.mz-content .mz-btn-amazon {
+  background: linear-gradient(135deg, #ff9900, #e47911);
+  box-shadow: 0 4px 14px rgba(255,153,0,0.35);
+}
+.mz-content .mz-btn-amazon:hover {
+  box-shadow: 0 8px 22px rgba(255,153,0,0.45);
+}
+
+/* ── CODE ─────────────────────────────────────── */
+.mz-content .mz-pre {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  padding: 20px 24px;
+  border-radius: var(--mz-radius);
+  overflow-x: auto;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 1.8rem 0;
+}
+.mz-content .mz-code {
+  background: var(--mz-beige);
+  color: var(--mz-green);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
+
+/* ── CALLOUT BOXES (auto-detect from WP classes) ── */
+/* WordPress often uses these classes — we restyle them */
+.mz-content .wp-block-info,
+.mz-content .notice,
+.mz-content .callout,
+.mz-content [class*="callout"],
+.mz-content [class*="notice"],
+.mz-content .mz-callout {
+  border-radius: var(--mz-radius);
+  padding: 18px 22px;
+  margin: 1.8rem 0;
+  font-family: var(--mz-font-ui);
+  font-size: 15px;
+  line-height: 1.65;
+  background: var(--mz-green-pale);
+  border: 1px solid #a5d6a7;
+}
+.mz-content [class*="warning"],
+.mz-content [class*="caution"],
+.mz-content .mz-callout-warning {
+  background: var(--mz-warn-bg);
+  border-color: var(--mz-warn-border);
+}
+.mz-content [class*="info"],
+.mz-content .mz-callout-info {
+  background: var(--mz-info-bg);
+  border-color: var(--mz-info-border);
+}
+
+/* ── PRODUCT / MODELE CARDS  ────────────────────── */
+/* Détecte les blocs WP avec une image + prix adjacente */
+.mz-content .wp-block-group,
+.mz-content .product-block,
+.mz-content [class*="product"],
+.mz-content [class*="modele"] {
+  border: 1px solid var(--mz-border);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 1.8rem 0;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  transition: box-shadow 0.25s;
+}
+.mz-content .wp-block-group:hover,
+.mz-content [class*="product"]:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+}
+
+/* ── STAT-LIKE PATTERN: 3+ sibling strong numbers ── */
+/* We can't auto-detect stat-boxes from WP HTML perfectly,
+   but any <p> that starts with a pure number + % or / gets a badge */
+.mz-stat-badge {
+  display: inline-block;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--mz-green);
+  font-family: var(--mz-font-ui);
+  line-height: 1;
+}
+
+/* ── HORIZONTAL RULE ────────────────────────────── */
+.mz-content hr {
+  border: none;
+  border-top: 2px solid var(--mz-beige);
+  margin: 2.5rem 0;
+}
+
+/* ── LIGHTBOX ───────────────────────────────────── */
+.mz-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: mzFadeIn 0.2s ease;
+}
+@keyframes mzFadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+.mz-lb-img {
+  max-width: 90vw;
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.mz-lb-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  color: #fff;
+  font-size: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  line-height: 1;
+}
+.mz-lb-close:hover { opacity: 1; }
+.mz-lb-counter {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.7);
+  font-family: var(--mz-font-ui);
+  font-size: 13px;
+}
+.mz-lb-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  font-size: 48px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  line-height: 1;
+  padding: 0 16px;
+}
+.mz-lb-nav:hover { opacity: 1; }
+.mz-lb-prev { left: 10px; }
+.mz-lb-next { right: 10px; }
+.mz-lb-caption {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  background: rgba(0,0,0,0.65);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-family: var(--mz-font-ui);
+  font-size: 14px;
+  white-space: nowrap;
+  max-width: 80vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────── */
+@media (max-width: 640px) {
+  .mz-content { font-size: 16px; }
+  .mz-content .mz-td, .mz-content .mz-th { padding: 9px 12px; font-size: 13px; }
+  .mz-gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .mz-content .mz-btn-affiliate { width: 100%; justify-content: center; }
+}
+`
