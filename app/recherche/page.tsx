@@ -41,7 +41,7 @@ export default function RecherchePage() {
     setLoading(true)
     try {
       // Recherche dans les produits
-      const productsResponse = await fetch(`/api/wordpress/products?search=${encodeURIComponent(searchTerm)}`)
+const productsResponse = await fetch(`/api/search/products?search=${encodeURIComponent(searchTerm)}`)
       const products = productsResponse.ok ? await productsResponse.json() : []
       
       // Recherche dans les articles de blog
