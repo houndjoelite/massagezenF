@@ -8,11 +8,11 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get("limit") || "12"
     const page = searchParams.get("page") || "1"
     const category = searchParams.get("category")
+    const search = searchParams.get("search")
 
     let endpoint = `/posts?per_page=${limit}&page=${page}&_embed&status=publish`
-    if (category) {
-      endpoint += `&categories=${category}`
-    }
+    if (category) endpoint += `&categories=${category}`
+    if (search) endpoint += `&search=${encodeURIComponent(search)}`
 
     const response = await fetchWithFallback(endpoint, {
       headers: { "Content-Type": "application/json" },
@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
     }
 
     const posts = await response.json()
-
     const totalPages = parseInt(response.headers.get("X-WP-TotalPages") || "1")
     const totalPosts = parseInt(response.headers.get("X-WP-Total") || "0")
 
@@ -55,7 +54,6 @@ export async function GET(request: NextRequest) {
       totalPosts,
       currentPage: parseInt(page),
     })
-
   } catch (error) {
     console.error("Error fetching WordPress posts:", error)
     return NextResponse.json(
