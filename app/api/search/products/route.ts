@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const response = await fetch(url, {
       headers: {
         Authorization: "Basic " + Buffer.from(
-          `${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`
+`${process.env.WOOCOMMERCE_CONSUMER_KEY}:${process.env.WOOCOMMERCE_CONSUMER_SECRET}`
         ).toString("base64"),
         "Content-Type": "application/json",
       },
