@@ -185,7 +185,7 @@ export function ProductDisplay({ product, className = "" }: ProductDisplayProps)
                 asChild={isInStock}
               >
                 {isInStock ? (
-                  
+                  <a
                     href={product.externalUrl || "#"}
                     target={product.externalUrl ? "_blank" : "_self"}
                     rel={product.externalUrl ? "noopener noreferrer sponsored" : undefined}
