@@ -2,11 +2,10 @@ import { ProductSchema, BreadcrumbSchema } from "@/components/schema-markup"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, ChevronRight, ShoppingCart } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { ProductDisplay } from "@/components/product-display"
-import { ArrowLeft, ChevronRight, ShoppingCart } from "lucide-react"
 
 const categorySlugMapping: Record<string, string> = {
   'pistolets-de-massage-musculaire': 'pistolets-massage',
@@ -21,6 +20,7 @@ const categorySlugMapping: Record<string, string> = {
   'massage-des-mains': 'mains',
   'fauteuils-de-massage': 'fauteuils-de-massage',
 }
+
 interface Category {
   id: number
   name: string
@@ -69,6 +69,7 @@ interface ProductPageProps {
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
 export async function generateMetadata({ params }: ProductPageProps) {
   const { slug } = await params
   const baseUrl = process.env.NODE_ENV === 'production'
@@ -164,7 +165,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     )
   }
 
- return (
+  return (
     <div className="min-h-screen">
       <Header />
       <ProductSchema product={{
@@ -221,58 +222,56 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {/* Produit principal */}
         <ProductDisplay product={product} />
 
-       {/* Produits similaires */}
-{relatedProducts.length > 0 && (
-  <section className="mt-24">
-    <div className="flex items-center gap-4 mb-10">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
-        Produits similaires
-      </h2>
-      <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
-      {relatedProducts[0]?.categorySlug && (
-        <Link
-          href={`/categories/${relatedProducts[0].categorySlug}`}
-          className="whitespace-nowrap text-sm text-primary font-medium hover:underline flex items-center gap-1"
-        >
-          Voir tout <ChevronRight className="w-4 h-4" />
-        </Link>
-      )}
-    </div>
+        {/* Produits similaires */}
+        {relatedProducts.length > 0 && (
+          <section className="mt-24">
+            <div className="flex items-center gap-4 mb-10">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                Produits similaires
+              </h2>
+              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+              {relatedProducts[0]?.categorySlug && (
+                <Link
+                  href={`/categories/${relatedProducts[0].categorySlug}`}
+                  className="whitespace-nowrap text-sm text-primary font-medium hover:underline flex items-center gap-1"
+                >
+                  Voir tout <ChevronRight className="w-4 h-4" />
+                </Link>
+              )}
+            </div>
 
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
-      {relatedProducts.map((related) => (
-        <Link
-          key={related.id}
-          href={`/produits/${related.slug}`}
-          className="group bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/20 transition-all duration-300 hover:-translate-y-1"
-        >
-          <div className="relative aspect-square overflow-hidden bg-gray-50 dark:bg-gray-800">
-            {related.image ? (
-              <Image
-                src={related.image}
-                alt={related.title}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <ShoppingCart className="w-8 h-8 text-gray-300" />
-              </div>
-            )}
-          </div>
-          <div className="p-4 space-y-2">
-            <h3 className="font-semibold text-sm line-clamp-2 text-gray-800 dark:text-gray-200 group-hover:text-primary transition-colors leading-snug">
-              {related.title}
-            </h3>
-            <p className="text-primary font-bold text-base">
-              {related.price} <span className="text-xs font-normal text-gray-500">{related.currency}</span>
-            </p>
-          </div>
-        </Link>
-      ))}
-    </div>
-  </section>
-)}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+              {relatedProducts.map((related) => (
+                <Link
+                  key={related.id}
+                  href={`/produits/${related.slug}`}
+                  className="group bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/20 transition-all duration-300 hover:-translate-y-1"
+                >
+                  <div className="relative aspect-square overflow-hidden bg-gray-50 dark:bg-gray-800">
+                    {related.image ? (
+                      <Image
+                        src={related.image}
+                        alt={related.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ShoppingCart className="w-8 h-8 text-gray-300" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4 space-y-2">
+                    <h3 className="font-semibold text-sm line-clamp-2 text-gray-800 dark:text-gray-200 group-hover:text-primary transition-colors leading-snug">
+                      {related.title}
+                    </h3>
+                    <p className="text-primary font-bold text-base">
+                      {related.price} <span className="text-xs font-normal text-gray-500">{related.currency}</span>
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
 
             {/* Lien vers la catégorie */}
             {relatedProducts[0]?.categorySlug && (
