@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { ProductDisplay } from "@/components/product-display"
-
+import { ArrowLeft, ChevronRight, ShoppingCart } from "lucide-react"
 
 const categorySlugMapping: Record<string, string> = {
   'pistolets-de-massage-musculaire': 'pistolets-massage',
@@ -221,36 +221,58 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {/* Produit principal */}
         <ProductDisplay product={product} />
 
-        {/* Produits similaires */}
-        {relatedProducts.length > 0 && (
-          <section className="mt-20">
-            <h2 className="text-2xl font-bold mb-8">Produits similaires</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-              {relatedProducts.map((related) => (
-                <Link
-                  key={related.id}
-                  href={`/produits/${related.slug}`}
-                  className="group border rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300"
-                >
-                  {related.image && (
-                    <div className="relative h-48 w-full overflow-hidden">
-                      <Image
-                        src={related.image}
-                        alt={related.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                  )}
-                  <div className="p-4">
-                    <h3 className="font-semibold text-sm line-clamp-2 mb-2 group-hover:text-primary transition-colors">
-                      {related.title}
-                    </h3>
-                    <p className="text-primary font-bold">{related.price} {related.currency}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
+       {/* Produits similaires */}
+{relatedProducts.length > 0 && (
+  <section className="mt-24">
+    <div className="flex items-center gap-4 mb-10">
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
+        Produits similaires
+      </h2>
+      <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+      {relatedProducts[0]?.categorySlug && (
+        <Link
+          href={`/categories/${relatedProducts[0].categorySlug}`}
+          className="whitespace-nowrap text-sm text-primary font-medium hover:underline flex items-center gap-1"
+        >
+          Voir tout <ChevronRight className="w-4 h-4" />
+        </Link>
+      )}
+    </div>
+
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+      {relatedProducts.map((related) => (
+        <Link
+          key={related.id}
+          href={`/produits/${related.slug}`}
+          className="group bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/20 transition-all duration-300 hover:-translate-y-1"
+        >
+          <div className="relative aspect-square overflow-hidden bg-gray-50 dark:bg-gray-800">
+            {related.image ? (
+              <Image
+                src={related.image}
+                alt={related.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <ShoppingCart className="w-8 h-8 text-gray-300" />
+              </div>
+            )}
+          </div>
+          <div className="p-4 space-y-2">
+            <h3 className="font-semibold text-sm line-clamp-2 text-gray-800 dark:text-gray-200 group-hover:text-primary transition-colors leading-snug">
+              {related.title}
+            </h3>
+            <p className="text-primary font-bold text-base">
+              {related.price} <span className="text-xs font-normal text-gray-500">{related.currency}</span>
+            </p>
+          </div>
+        </Link>
+      ))}
+    </div>
+  </section>
+)}
 
             {/* Lien vers la catégorie */}
             {relatedProducts[0]?.categorySlug && (
