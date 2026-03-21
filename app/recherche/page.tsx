@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Star, ExternalLink, Search } from "lucide-react"
+import { ExternalLink, Search } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import Header from "@/components/header"
@@ -15,7 +15,7 @@ interface SearchResult {
   id: string
   title: string
   content: string
-  type: 'product' | 'post' | 'page'
+  type: 'product' | 'post'
   url: string
   image?: string
   price?: string
@@ -30,46 +30,43 @@ export default function RecherchePage() {
   const [searchQuery, setSearchQuery] = useState(query)
 
   useEffect(() => {
-    if (query) {
-      performSearch(query)
-    }
+    if (query) performSearch(query)
   }, [query])
 
   const performSearch = async (searchTerm: string) => {
     if (!searchTerm.trim()) return
-    
     setLoading(true)
     try {
-      // Recherche dans les produits
-const productsResponse = await fetch(`/api/search/products?search=${encodeURIComponent(searchTerm)}`)
+      const [productsResponse, postsResponse] = await Promise.all([
+        fetch(`/api/search/products?search=${encodeURIComponent(searchTerm)}`),
+        fetch(`/api/wordpress/posts?search=${encodeURIComponent(searchTerm)}`),
+      ])
+
       const products = productsResponse.ok ? await productsResponse.json() : []
-      
-      // Recherche dans les articles de blog
-      const postsResponse = await fetch(`/api/wordpress/posts?search=${encodeURIComponent(searchTerm)}`)
-      const posts = postsResponse.ok ? await postsResponse.json() : []
-      
-      // Transformer les résultats
+      const postsData = postsResponse.ok ? await postsResponse.json() : { posts: [] }
+      const posts = postsData.posts ?? []
+
       const searchResults: SearchResult[] = [
-        ...products.map((product: any) => ({
-          id: product.id,
-          title: product.name,
-          content: product.description,
+        ...products.map((p: any) => ({
+          id: p.id,
+          title: p.name,
+          content: p.description,
           type: 'product' as const,
-          url: `/produits/${product.id}`,
-          image: product.image,
-          price: product.price,
-          category: product.category
+          url: `/produits/${p.slug}`,
+          image: p.image,
+          price: p.price,
+          category: p.category,
         })),
         ...posts.map((post: any) => ({
           id: post.id,
-          title: post.title.rendered,
-          content: post.excerpt.rendered.replace(/<[^>]*>/g, ''), // Supprimer les balises HTML
+          title: post.title,
+          content: post.excerpt,
           type: 'post' as const,
           url: `/blog/${post.slug}`,
-          image: post._embedded?.['wp:featuredmedia']?.[0]?.source_url
-        }))
+          image: post.image,
+        })),
       ]
-      
+
       setResults(searchResults)
     } catch (error) {
       console.error('Erreur lors de la recherche:', error)
@@ -89,9 +86,10 @@ const productsResponse = await fetch(`/api/search/products?search=${encodeURICom
   return (
     <div className="min-h-screen">
       <Header />
-      
+
       <main className="py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+
           {/* Barre de recherche */}
           <div className="max-w-2xl mx-auto mb-8">
             <form onSubmit={handleSearch} className="flex gap-2">
@@ -114,7 +112,7 @@ const productsResponse = await fetch(`/api/search/products?search=${encodeURICom
           {/* Résultats */}
           {loading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
               <p className="mt-2 text-muted-foreground">Recherche en cours...</p>
             </div>
           ) : query ? (
@@ -122,7 +120,7 @@ const productsResponse = await fetch(`/api/search/products?search=${encodeURICom
               <h1 className="text-2xl font-bold mb-6">
                 Résultats pour "{query}" ({results.length} résultat{results.length > 1 ? 's' : ''})
               </h1>
-              
+
               {results.length === 0 ? (
                 <div className="text-center py-12">
                   <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -151,7 +149,6 @@ const productsResponse = await fetch(`/api/search/products?search=${encodeURICom
                               />
                             </div>
                           )}
-                          
                           <div className="flex-1 space-y-2">
                             <div className="flex items-start justify-between">
                               <h3 className="text-xl font-semibold hover:text-primary transition-colors">
@@ -161,29 +158,24 @@ const productsResponse = await fetch(`/api/search/products?search=${encodeURICom
                                 {result.type === 'product' ? 'Produit' : 'Article'}
                               </Badge>
                             </div>
-                            
+
                             {result.category && (
                               <p className="text-sm text-muted-foreground">{result.category}</p>
                             )}
-                            
                             {result.price && (
                               <p className="text-lg font-bold text-primary">{result.price}</p>
                             )}
-                            
-                            <p className="text-muted-foreground line-clamp-2">
-                              {result.content}
-                            </p>
-                            
+                            <p className="text-muted-foreground line-clamp-2">{result.content}</p>
+
                             <div className="flex items-center justify-between pt-2">
                               <Button asChild variant="outline" size="sm">
                                 <Link href={result.url}>
-                                  {result.type === 'product' ? 'Voir le produit' : 'Lire l\'article'}
+                                  {result.type === 'product' ? 'Voir le produit' : "Lire l'article"}
                                 </Link>
                               </Button>
-                              
                               {result.type === 'product' && (
                                 <Button asChild size="sm">
-                                  <Link href="#" target="_blank" rel="noopener noreferrer">
+                                  <Link href={result.url} target="_blank" rel="noopener noreferrer">
                                     Voir sur Amazon
                                     <ExternalLink className="ml-2 h-4 w-4" />
                                   </Link>
@@ -209,7 +201,7 @@ const productsResponse = await fetch(`/api/search/products?search=${encodeURICom
           )}
         </div>
       </main>
-      
+
       <Footer />
     </div>
   )
