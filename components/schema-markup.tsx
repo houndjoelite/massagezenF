@@ -11,7 +11,6 @@ interface ProductSchemaProps {
     slug: string
   }
 }
-
 interface ArticleSchemaProps {
   article: {
     title: string
@@ -22,7 +21,6 @@ interface ArticleSchemaProps {
     slug: string
   }
 }
-
 interface BreadcrumbSchemaProps {
   items: {
     name: string
@@ -33,6 +31,10 @@ interface BreadcrumbSchemaProps {
 const baseUrl = 'https://monappareildemassage.com'
 
 export function ProductSchema({ product }: ProductSchemaProps) {
+  const priceValidUntil = new Date()
+  priceValidUntil.setFullYear(priceValidUntil.getFullYear() + 1)
+  const priceValidUntilStr = priceValidUntil.toISOString().split("T")[0]
+
   const schema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -40,14 +42,23 @@ export function ProductSchema({ product }: ProductSchemaProps) {
     "description": product.description,
     "image": product.image || undefined,
     "url": `${baseUrl}/produits/${product.slug}`,
+    "brand": {
+      "@type": "Brand",
+      "name": "MassageZen"
+    },
     "offers": {
       "@type": "Offer",
       "price": product.price,
       "priceCurrency": "EUR",
+      "priceValidUntil": priceValidUntilStr,
       "availability": product.stockStatus === "instock"
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
       "url": `${baseUrl}/produits/${product.slug}`,
+      "seller": {
+        "@type": "Organization",
+        "name": "MassageZen"
+      }
     },
     ...(product.averageRating > 0 && {
       "aggregateRating": {
@@ -57,7 +68,7 @@ export function ProductSchema({ product }: ProductSchemaProps) {
         "bestRating": 5,
         "worstRating": 1,
       }
-    })
+    }),
   }
 
   return (
