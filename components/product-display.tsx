@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button"
-import { Star, ShoppingCart, ExternalLink, Shield, Truck, RotateCcw, ChevronRight } from "lucide-react"
+import { Star, ShoppingCart, ExternalLink, Shield, Truck, RotateCcw } from "lucide-react"
 import { ProductGallery } from "./product-gallery"
-import Link from "next/link"
 
 interface Category {
   id: number
