@@ -20,18 +20,17 @@ async function getPosts() {
       cache: 'no-store'
     })
     if (!response.ok) return []
-    return await response.json()
+    const data = await response.json()
+    return data.posts || data
   } catch {
     return []
   }
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-
   const products = await getProducts()
   const posts = await getPosts()
 
-  // Pages statiques
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -119,7 +118,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  // Pages produits dynamiques
   const productPages: MetadataRoute.Sitemap = products.map((product: any) => ({
     url: `${baseUrl}/produits/${product.slug}`,
     lastModified: new Date(product.publishedAt || new Date()),
@@ -127,7 +125,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }))
 
-  // Pages articles dynamiques
   const postPages: MetadataRoute.Sitemap = posts.map((post: any) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: new Date(post.publishedAt || new Date()),
