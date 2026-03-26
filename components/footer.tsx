@@ -128,7 +128,7 @@ export default function Footer() {
 
         <div className="border-t mt-12 pt-8 text-center text-muted-foreground">
           <p>
-            © 2024 MassageZen. Tous droits réservés. |
+            © 2026 MassageZen. Tous droits réservés. |
             <span className="text-xs ml-2">
               En tant que Partenaire Amazon, nous réalisons un bénéfice sur les achats remplissant les conditions
               requises.
