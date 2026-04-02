@@ -111,7 +111,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/politique-retour" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/politique-retour.tsx" className="text-muted-foreground hover:text-primary transition-colors">
 Politique de Retour
                 </Link>
               </li>
