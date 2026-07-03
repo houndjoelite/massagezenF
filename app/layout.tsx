@@ -7,7 +7,6 @@ import SimpleCookieBanner from "@/components/simple-cookie-banner"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
-
 export const metadata: Metadata = {
   metadataBase: new URL('https://monappareildemassage.com'),
   title: {
@@ -68,8 +67,10 @@ export const metadata: Metadata = {
     description: "Guides d'experts et comparatifs des meilleurs appareils de massage 2026",
     images: ["/og-image-massagezen.png"],
   },
+  other: {
+    linkavista: "ca0d015681181509ca8bb116d5a863220848e615",
+  },
 }
-
 export default function RootLayout({
   children,
 }: Readonly<{
